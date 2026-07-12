@@ -27,7 +27,6 @@ def stripe_payment_intent(request):
         if stripe_error:
             message = getattr(exc, "user_message", None) or str(exc)
             return Response({"detail": message}, status=status.HTTP_502_BAD_GATEWAY)
-        raise
     return Response(
         {
             "payment_id": payment.id,

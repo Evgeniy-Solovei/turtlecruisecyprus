@@ -52,12 +52,26 @@ def create_or_get_payment_intent(booking: Booking) -> Payment:
     if payment and payment.provider_client_secret:
         return payment
 
+    if payment:
+        if payment.stripe_checkout_session_id:
+            try:
+                session = retrieve_checkout_session(payment.stripe_checkout_session_id)
+                client_secret = session.get("client_secret")
+                if session.get("status") == "open" and client_secret:
+                    payment.provider_client_secret = client_secret
+                    payment.save(update_fields=["provider_client_secret"])
+                    return payment
+            except Exception:
+                pass
+        payment.delete()
+
     expires_unix = checkout_session_expires_at()
     metadata = {
         "booking_public_id": booking.public_id,
         "booking_id": str(booking.id),
     }
-    idempotency_key = f"booking:{booking.public_id}:checkout-session:v1"
+    attempt = Payment.objects.filter(booking=booking).count() + 1
+    idempotency_key = f"booking:{booking.public_id}:checkout-session:v{attempt}"
     return_url = (
         f"{settings.SITE_BASE_URL.rstrip('/')}/booking-return/"
         f"?tc_booking_return={booking.public_id}&session_id={{CHECKOUT_SESSION_ID}}"

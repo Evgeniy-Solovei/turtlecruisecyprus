@@ -119,13 +119,13 @@ def _import_footer_config(options: dict, media_map: dict[int, str]) -> None:
         "/static/frontend/img/dist/paypal.svg",
         "/static/frontend/img/dist/revolut.svg",
     ]
-    payment_icons = []
-    for i, item in enumerate(_parse_option_repeater(options, "options_payment_icons")):
-        url = _media_url(media_map, item.get("icon", ""))
-        if not url and i < len(payment_static):
-            url = payment_static[i]
-        if url:
-            payment_icons.append({"url": url, "alt": item.get("alt", "")})
+    payment_icons = [
+        {"url": url, "alt": item.get("alt", name)}
+        for url, name in zip(
+            payment_static,
+            ("Visa", "Mastercard", "PayPal", "Revolut"),
+        )
+    ]
 
     footer = {
         "en": {
@@ -145,8 +145,8 @@ def _import_footer_config(options: dict, media_map: dict[int, str]) -> None:
         "payment_icons": payment_icons,
         "made_by_label": options.get("options_footer_made_by_label", "Made by"),
         "made_by_url": options.get("options_footer_made_by_url", ""),
-        "made_by_logo": _media_url(media_map, options.get("options_footer_made_by_logo", "")),
-        "footer_logo": _media_url(media_map, options.get("options_footer_logo", "")),
+        "made_by_logo": "/static/frontend/img/dist/ochi.svg",
+        "footer_logo": "/static/frontend/img/dist/footer-logo.svg",
     }
     SiteConfig.objects.update_or_create(key="footer", defaults={"value": footer})
 
