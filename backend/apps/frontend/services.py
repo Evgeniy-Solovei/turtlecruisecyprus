@@ -85,7 +85,7 @@ def build_booking_config(locale: str = DEFAULT_LOCALE) -> dict:
         "i18n": {
             "selectDate": t.get("select_date", "Please select a date."),
             "selectCruise": t.get("select_cruise", "Please select a cruise."),
-            "agreeTerms": t.get("agree_terms", "Please agree to the Terms and Conditions."),
+            "agreeTerms": t.get("agree_terms_required", "Please check the box to agree to the Terms and Conditions."),
             "checkout": t.get("checkout", "Checkout"),
             "enterFirstName": f"Please enter your {t.get('first_name', 'first name').lower()}.",
             "enterLastName": f"Please enter your {t.get('last_name', 'last name').lower()}.",

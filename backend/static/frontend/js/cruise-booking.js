@@ -480,7 +480,7 @@
 
   function validateStep1() {
     var date = $dateInput.val();
-    var type = $('input[name="cruise_type"]:checked').val();
+    var type = $('input[name="cruise_type"]:checked').val() || state.cruiseType;
 
     if (!date) {
       alert(tcBooking.i18n.selectDate);
@@ -489,8 +489,16 @@
     }
 
     if (!type) {
-      alert(tcBooking.i18n.selectCruise);
+      if ($('input[name="cruise_type"]').length === 0) {
+        alert('Cruises are not configured yet. Import site data or add cruises in admin.');
+      } else {
+        alert(tcBooking.i18n.selectCruise);
+      }
       return false;
+    }
+
+    if ($('input[name="cruise_type"][value="' + type + '"]').length) {
+      $('input[name="cruise_type"][value="' + type + '"]').prop('checked', true);
     }
 
     if (!$termsAgree.is(':checked')) {

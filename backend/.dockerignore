@@ -11,7 +11,6 @@ db.sqlite3
 .gitignore
 *.md
 docs/
-media/
 staticfiles/
 .pytest_cache
 .coverage

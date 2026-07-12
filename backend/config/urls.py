@@ -29,5 +29,7 @@ urlpatterns = [
 
 handler404 = "apps.frontend.views.page_not_found"
 
+# WhiteNoise serves /static/ in production; media stays on disk under MEDIA_ROOT.
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 if settings.DEBUG:
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

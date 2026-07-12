@@ -25,7 +25,7 @@ services:
       - "${WEB_HOST_PORT:-8001}:8000"
     volumes:
       - static_data:/app/staticfiles
-      - ${MEDIA_HOST_PATH:-media_data}:/app/media
+      - ${MEDIA_HOST_PATH:-./media}:/app/media
     depends_on:
       postgres:
         condition: service_healthy
@@ -46,7 +46,7 @@ services:
       - certbot_www:/var/www/certbot
       - certbot_certs:/etc/letsencrypt
       - static_data:/app/staticfiles:ro
-      - ${MEDIA_HOST_PATH:-media_data}:/app/media:ro
+      - ${MEDIA_HOST_PATH:-./media}:/app/media:ro
     depends_on:
       web:
         condition: service_started
@@ -66,7 +66,7 @@ services:
       CELERY_BROKER_URL: redis://redis:6379/0
       CELERY_RESULT_BACKEND: redis://redis:6379/1
     volumes:
-      - ${MEDIA_HOST_PATH:-media_data}:/app/media
+      - ${MEDIA_HOST_PATH:-./media}:/app/media
     depends_on:
       postgres:
         condition: service_healthy

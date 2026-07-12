@@ -37,9 +37,7 @@ backend/db.sqlite3
 backend/*.sqlite3
 backend/staticfiles/
 
-# User uploads (copy via rsync to server, not git)
-backend/media/
-!backend/media/.gitkeep
+# WP media (in git — needed for /media/wp/ after import_wp_site)
 
 # WordPress dump (large, contains customer data)
 turtlecruisebyscubacat/

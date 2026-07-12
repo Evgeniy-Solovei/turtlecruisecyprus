@@ -9,6 +9,7 @@ from rest_framework.response import Response
 from apps.bookings.models import Booking
 
 from .services import checkout_deadline_for_payment, create_or_get_payment_intent, verify_checkout_session_and_confirm, verify_payment_intent_and_confirm
+from .stripe_client import StripeNotConfigured
 from .webhooks import handle_stripe_webhook
 
 
@@ -17,8 +18,16 @@ def stripe_payment_intent(request):
     booking = get_object_or_404(Booking.objects.select_related("cruise"), public_id=request.data["booking_id"])
     try:
         payment = create_or_get_payment_intent(booking)
+    except StripeNotConfigured as exc:
+        return Response({"detail": str(exc)}, status=status.HTTP_503_SERVICE_UNAVAILABLE)
     except ValueError as exc:
         return Response({"detail": str(exc)}, status=status.HTTP_410_GONE)
+    except Exception as exc:
+        stripe_error = type(exc).__module__.startswith("stripe")
+        if stripe_error:
+            message = getattr(exc, "user_message", None) or str(exc)
+            return Response({"detail": message}, status=status.HTTP_502_BAD_GATEWAY)
+        raise
     return Response(
         {
             "payment_id": payment.id,
