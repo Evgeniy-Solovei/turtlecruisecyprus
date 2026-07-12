@@ -1,9 +1,12 @@
 #!/bin/bash
 set -euo pipefail
 
+mkdir -p /app/staticfiles /app/media
+chown -R appuser:appuser /app/staticfiles /app/media
+
 if [ "${RUN_MIGRATIONS:-0}" = "1" ]; then
   echo "==> Waiting for database..."
-  python <<'PY'
+  gosu appuser python <<'PY'
 import os
 import sys
 import time
@@ -28,7 +31,7 @@ else:
 PY
 
   echo "==> Checking pending migrations..."
-  python manage.py showmigrations --plan | tee /tmp/migration-plan.log
+  gosu appuser python manage.py showmigrations --plan | tee /tmp/migration-plan.log
   if grep -q '\[ \]' /tmp/migration-plan.log; then
     echo "Unapplied migrations detected — running migrate..."
   else
@@ -36,17 +39,17 @@ PY
   fi
 
   echo "==> Applying migrations..."
-  python manage.py migrate --noinput
+  gosu appuser python manage.py migrate --noinput
 
-  if python manage.py showmigrations --plan | grep -q '\[ \]'; then
+  if gosu appuser python manage.py showmigrations --plan | grep -q '\[ \]'; then
     echo "ERROR: migrations still pending after migrate." >&2
     exit 1
   fi
 
   echo "==> Collecting static files (whitenoise)..."
-  python manage.py collectstatic --noinput
+  gosu appuser python manage.py collectstatic --noinput
 else
   echo "==> Skipping migrations/collectstatic (RUN_MIGRATIONS!=1)"
 fi
 
-exec "$@"
+exec gosu appuser "$@"

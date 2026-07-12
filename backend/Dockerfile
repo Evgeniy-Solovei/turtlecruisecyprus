@@ -8,7 +8,7 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 WORKDIR /app
 
 RUN apt-get update \
-    && apt-get install -y --no-install-recommends build-essential libpq-dev curl \
+    && apt-get install -y --no-install-recommends build-essential libpq-dev curl gosu \
     && rm -rf /var/lib/apt/lists/*
 
 COPY requirements.txt .
@@ -20,7 +20,8 @@ RUN chmod +x /app/scripts/docker-entrypoint.sh \
     && adduser --disabled-password --gecos '' appuser \
     && chown -R appuser:appuser /app
 
-USER appuser
+# Entrypoint fixes volume permissions, then drops to appuser for the app.
+USER root
 
 EXPOSE 8000
 
