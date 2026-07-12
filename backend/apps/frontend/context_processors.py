@@ -4,6 +4,7 @@ import json
 
 from django.conf import settings
 
+from apps.cms.asset_urls import normalize_footer_config
 from apps.cms.models import SiteConfig
 from apps.cruises.selectors import get_active_cruises
 from apps.cruises.time_utils import default_times_for_cruise
@@ -52,7 +53,7 @@ def booking_config(request):
             socials = row.value
         frow = SiteConfig.objects.filter(key="footer").first()
         if frow:
-            footer = frow.value
+            footer = normalize_footer_config(frow.value)
     except Exception:
         pass
 

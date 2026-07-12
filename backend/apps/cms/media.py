@@ -3,6 +3,8 @@ from __future__ import annotations
 import re
 from typing import Any
 
+from .asset_urls import STATIC_DIST_FILENAMES, STATIC_DIST_PREFIX, resolve_public_asset_url
+
 _media_map: dict[int, str] = {}
 
 
@@ -45,8 +47,24 @@ def fix_media_urls_in_html(html: str) -> str:
     """Rewrite broken imported media URLs in stored HTML."""
     if not html:
         return html
-    return re.sub(
+    html = re.sub(
         r"/media/wp/home/ochihost/[^/]+/www/wp-content/uploads/",
         "/media/wp/",
         html,
     )
+    html = re.sub(
+        r'src="/img/dist/([^"]+)"',
+        rf'src="{STATIC_DIST_PREFIX}\1"',
+        html,
+    )
+    for name in STATIC_DIST_FILENAMES:
+        html = re.sub(
+            rf"/media/wp/[^\"'>]*{re.escape(name)}",
+            f"{STATIC_DIST_PREFIX}{name}",
+            html,
+        )
+    return html
+
+
+def resolve_attachment_url(url: str) -> str:
+    return resolve_public_asset_url(url)

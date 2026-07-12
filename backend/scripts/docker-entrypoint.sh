@@ -48,6 +48,9 @@ PY
 
   echo "==> Collecting static files (whitenoise)..."
   gosu appuser python manage.py collectstatic --noinput
+
+  echo "==> Ensuring site assets (footer icons, media check)..."
+  gosu appuser python manage.py ensure_site_assets
 else
   echo "==> Skipping migrations/collectstatic (RUN_MIGRATIONS!=1)"
 fi
