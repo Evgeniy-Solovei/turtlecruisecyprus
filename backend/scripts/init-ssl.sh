@@ -19,13 +19,13 @@ if [ -z "${DOMAIN:-}" ] || [ -z "${CERTBOT_EMAIL:-}" ]; then
 fi
 
 echo "==> Starting base stack..."
-docker compose -f docker-compose.prod.yml up -d postgres redis web
+docker compose --profile bundled-nginx up -d postgres redis web
 
 echo "==> Starting nginx (HTTP, for ACME challenge)..."
-docker compose -f docker-compose.prod.yml up -d nginx
+docker compose --profile bundled-nginx up -d nginx
 
 echo "==> Requesting certificate for ${DOMAIN}..."
-docker compose -f docker-compose.prod.yml exec nginx certbot certonly \
+docker compose --profile bundled-nginx exec nginx certbot certonly \
   --webroot -w /var/www/certbot \
   -d "${DOMAIN}" \
   --email "${CERTBOT_EMAIL}" \
@@ -34,7 +34,7 @@ docker compose -f docker-compose.prod.yml exec nginx certbot certonly \
   --non-interactive
 
 echo "==> Restarting nginx with SSL..."
-docker compose -f docker-compose.prod.yml restart nginx
+docker compose --profile bundled-nginx restart nginx
 
 echo "Done. Site should be available at https://${DOMAIN}/"
 echo "Auto-renewal runs inside nginx container every 12 hours."

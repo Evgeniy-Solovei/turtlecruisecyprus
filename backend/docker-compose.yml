@@ -1,16 +1,109 @@
-# Локальная разработка: только Postgres + Redis (порты на localhost).
-# Django запускаешь на хосте: python manage.py runserver
-#   ./scripts/migrate-to-postgres.sh
+# Сервер:
+#   docker compose up -d --build
+#
+# Свой nginx (отдельный VPS, 80/443 свободны):
+#   docker compose --profile bundled-nginx up -d --build
+#
+# Общий VPS (внешний nginx, boomerang на 8000):
+#   WEB_HOST_PORT=8001 в .env
 
 services:
+  web:
+    build: .
+    env_file:
+      - .env
+    environment:
+      DJANGO_SETTINGS_MODULE: config.settings.production
+      RUN_MIGRATIONS: "1"
+      DATABASE_URL: postgresql://turtlecruise:turtlecruise@postgres:5432/turtlecruise
+      REDIS_URL: redis://redis:6379/0
+      CELERY_BROKER_URL: redis://redis:6379/0
+      CELERY_RESULT_BACKEND: redis://redis:6379/1
+    expose:
+      - "8000"
+    ports:
+      - "${WEB_HOST_PORT:-8001}:8000"
+    volumes:
+      - static_data:/app/staticfiles
+      - ${MEDIA_HOST_PATH:-media_data}:/app/media
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    restart: unless-stopped
+
+  nginx:
+    profiles:
+      - bundled-nginx
+    build: ./deploy/nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      DOMAIN: ${DOMAIN}
+    volumes:
+      - certbot_www:/var/www/certbot
+      - certbot_certs:/etc/letsencrypt
+      - static_data:/app/staticfiles:ro
+      - ${MEDIA_HOST_PATH:-media_data}:/app/media:ro
+    depends_on:
+      web:
+        condition: service_started
+    restart: unless-stopped
+
+  worker:
+    build: .
+    entrypoint: ["/app/scripts/docker-entrypoint.sh"]
+    command: ["celery", "-A", "config", "worker", "-l", "info"]
+    env_file:
+      - .env
+    environment:
+      DJANGO_SETTINGS_MODULE: config.settings.production
+      RUN_MIGRATIONS: "0"
+      DATABASE_URL: postgresql://turtlecruise:turtlecruise@postgres:5432/turtlecruise
+      REDIS_URL: redis://redis:6379/0
+      CELERY_BROKER_URL: redis://redis:6379/0
+      CELERY_RESULT_BACKEND: redis://redis:6379/1
+    volumes:
+      - ${MEDIA_HOST_PATH:-media_data}:/app/media
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_started
+      web:
+        condition: service_started
+    restart: unless-stopped
+
+  beat:
+    build: .
+    entrypoint: ["/app/scripts/docker-entrypoint.sh"]
+    command: ["celery", "-A", "config", "beat", "-l", "info"]
+    env_file:
+      - .env
+    environment:
+      DJANGO_SETTINGS_MODULE: config.settings.production
+      RUN_MIGRATIONS: "0"
+      DATABASE_URL: postgresql://turtlecruise:turtlecruise@postgres:5432/turtlecruise
+      REDIS_URL: redis://redis:6379/0
+      CELERY_BROKER_URL: redis://redis:6379/0
+      CELERY_RESULT_BACKEND: redis://redis:6379/1
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_started
+      web:
+        condition: service_started
+    restart: unless-stopped
+
   postgres:
     image: postgres:16-alpine
     environment:
       POSTGRES_DB: turtlecruise
       POSTGRES_USER: turtlecruise
       POSTGRES_PASSWORD: turtlecruise
-    ports:
-      - "5432:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
     healthcheck:
@@ -22,9 +115,11 @@ services:
 
   redis:
     image: redis:7-alpine
-    ports:
-      - "6379:6379"
     restart: unless-stopped
 
 volumes:
   pgdata:
+  media_data:
+  static_data:
+  certbot_www:
+  certbot_certs:

@@ -4,7 +4,7 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 
 echo "Starting Postgres + Redis..."
-docker compose up -d postgres redis
+docker compose -f docker-compose.dev.yml up -d postgres redis
 
 export DATABASE_URL="${DATABASE_URL:-postgresql://turtlecruise:turtlecruise@localhost:5432/turtlecruise}"
 
@@ -28,7 +28,7 @@ else
 fi
 
 echo "Waiting for Postgres..."
-until docker compose exec -T postgres pg_isready -U turtlecruise -d turtlecruise >/dev/null 2>&1; do
+until docker compose -f docker-compose.dev.yml exec -T postgres pg_isready -U turtlecruise -d turtlecruise >/dev/null 2>&1; do
   sleep 1
 done
 
