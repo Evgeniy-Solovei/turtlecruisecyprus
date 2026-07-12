@@ -24,8 +24,6 @@ def _resolve_path(request) -> str:
 
 MIN_IMPORTED_BODY = 2000
 RESERVED_SLUGS = {key.rstrip("/") for key in PAGES} | {key.rstrip("/") for key in REDIRECTS}
-# Pages with templates in git — import_wp_site must not override layout/buttons/copy.
-GIT_TEMPLATE_SLUGS = {key.rstrip("/") for key, (_, _, partial) in PAGES.items() if partial}
 
 
 def _page_context(request, path: str) -> dict:
@@ -48,8 +46,7 @@ def _page_context(request, path: str) -> dict:
     use_imported = bool(
         site_page
         and site_page.body_html.strip()
-        and slug not in GIT_TEMPLATE_SLUGS
-        and len(site_page.body_html) >= MIN_IMPORTED_BODY
+        and (len(site_page.body_html) >= MIN_IMPORTED_BODY or slug == "blog")
     )
     if use_imported and site_page:
         ctx["page_html"] = fix_media_urls_in_html(site_page.body_html)
