@@ -4,13 +4,13 @@ Thumbs.db
 
 # Secrets — NEVER commit
 .env
-.env.*
-!.env.example
 backend/.env
-backend/.env.*
-!.backend/.env.example
 .turtlecruise_secrets.local.env
 *.local.env
+
+# Env templates (must stay in git)
+!.env.example
+!backend/.env.example
 
 # Python
 __pycache__/
