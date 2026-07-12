@@ -1,0 +1,11 @@
+{% load cms_extras %}
+<div class="flex" id="blog-grid">
+  {% include "includes/blog_cards.html" %}
+</div>
+{% if has_more %}
+<div class="flex-btn" id="blog-load-more-wrap">
+  <button class="blog__btn" id="blog-load-more" type="button" data-page="1" data-per-page="{{ per_page }}" data-max-pages="{{ max_pages }}">
+    {{ load_more_label }}
+  </button>
+</div>
+{% endif %}

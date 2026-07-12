@@ -1,0 +1,32 @@
+{% load cms_extras %}
+<section class="section gallery"{% if d.block_id %} id="{{ d.block_id }}"{% endif %}>
+  <div class="container">
+    <div class="gallery__header">
+      {% if d.title %}<h1 class="gallery__title">{{ d.title|safe }}</h1>{% endif %}
+      {% if d.instagram_url and d.instagram_handle %}
+      <p class="gallery__sub">Follow us on <a href="{{ d.instagram_url }}" target="_blank" rel="noopener noreferrer">{{ d.instagram_handle }}</a></p>
+      {% endif %}
+    </div>
+    {% if d.items %}
+    <div class="gallery__masonry gallery__masonry--static">
+      {% gallery_masonry_columns d.items as gallery_columns %}
+      {% for offset, col_items in gallery_columns %}
+      <div class="gallery__col{% if offset %} gallery__col--offset{% endif %}">
+        {% for item in col_items %}
+        <div class="gallery__item{% if item.size %} gallery__item--{{ item.size }}{% endif %}">
+          {% if item.image %}
+          <a href="{% media item.image %}" data-fancybox="gallery" data-caption="{{ item.alt|default:'' }}">
+            <img src="{% media item.image %}" alt="{{ item.alt|default:'' }}">
+          </a>
+          {% endif %}
+        </div>
+        {% endfor %}
+      </div>
+      {% endfor %}
+    </div>
+    <div class="flex-btn flex-load">
+      <a class="load-gallery" href="#">{{ d.load_btn_label|default:"Load MORE photos" }}</a>
+    </div>
+    {% endif %}
+  </div>
+</section>

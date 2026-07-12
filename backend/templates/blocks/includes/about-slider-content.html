@@ -1,0 +1,7 @@
+{% load cms_extras %}
+{% if d.lead or d.content %}
+<div class="about-slider__content">
+  {% if d.lead %}<p class="about-slider__lead">{{ d.lead }}</p>{% endif %}
+  {% if d.content %}{{ d.content|safe }}{% endif %}
+</div>
+{% endif %}

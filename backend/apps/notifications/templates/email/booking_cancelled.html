@@ -1,0 +1,17 @@
+{% extends "email/base.html" %}
+
+{% block title %}Booking Cancelled #{{ booking_public_id }}{% endblock %}
+
+{% block header %}
+<tr>
+  <td style="background-color:#096d8e;padding:36px 48px;border-radius:3px 3px 0 0;">
+    <h1 style="color:#ffffff;font-family:Arial,sans-serif;font-size:24px;font-weight:300;line-height:150%;margin:0;">Booking cancelled</h1>
+  </td>
+</tr>
+{% endblock %}
+
+{% block content %}
+<p style="font-size:16px;margin:0 0 10px;color:#000;">Dear <strong>{{ booking.customer.first_name }}</strong>,</p>
+<p style="font-size:14px;color:#555555;margin:0 0 16px;">Your booking <strong>#{{ booking_public_id }}</strong> for <strong>{{ cruise_name }}</strong> on <strong>{{ date_formatted }}</strong> has been cancelled.</p>
+<p style="font-size:13px;color:#555555;margin:0;">If you have questions, contact us at <a href="mailto:{{ support_email }}" style="color:#096d8e;">{{ support_email }}</a>.</p>
+{% endblock %}

@@ -1,0 +1,87 @@
+{% extends "email/base.html" %}
+
+{% block title %}Booking Confirmation #{{ booking_public_id }}{% endblock %}
+
+{% block header %}
+<tr>
+  <td style="background-color:#096d8e;padding:36px 48px;border-radius:3px 3px 0 0;">
+    <h1 style="color:#ffffff;font-family:Arial,sans-serif;font-size:28px;font-weight:300;line-height:150%;margin:0;">Your booking is confirmed!</h1>
+  </td>
+</tr>
+{% endblock %}
+
+{% block content %}
+<p style="font-size:16px;margin:0 0 10px;color:#000;">Dear <strong>{{ booking.customer.first_name }}</strong>,</p>
+<p style="font-size:15px;font-weight:500;margin:0 0 10px;color:#000;">Thank you for booking with Turtle Cruise by SCUBACAT!</p>
+<p style="font-size:13px;color:#555555;margin:0 0 14px;">Your payment has been successfully processed and your spot is confirmed.</p>
+<span style="display:inline-block;background:#096d8e;color:#ffffff;font-size:12px;padding:5px 14px;border-radius:20px;margin:0 0 14px;">✓ Booking confirmed</span>
+<p style="font-size:12px;color:#666666;margin:0 0 20px;">You don't have to print your ticket — just show this email or a screenshot at the entrance.</p>
+
+<hr style="border:none;border-top:1px solid #d0d4e8;margin:20px 0;">
+
+<p style="font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#096d8e;margin:0 0 12px;">Booking details</p>
+<div style="background:#f3f4fb;border-radius:10px;padding:16px 18px;">
+  <div style="display:table;width:100%;padding:7px 0;border-bottom:1px solid #eef0f8;font-size:13px;">
+    <span style="display:table-cell;color:#555555;width:45%">Booking ID</span>
+    <span style="display:table-cell;font-weight:500;">#{{ booking_public_id }}</span>
+  </div>
+  <div style="display:table;width:100%;padding:7px 0;border-bottom:1px solid #eef0f8;font-size:13px;">
+    <span style="display:table-cell;color:#555555;width:45%">Cruise</span>
+    <span style="display:table-cell;font-weight:500;">{{ cruise_name }}</span>
+  </div>
+  <div style="display:table;width:100%;padding:7px 0;border-bottom:1px solid #eef0f8;font-size:13px;">
+    <span style="display:table-cell;color:#555555;width:45%">Date</span>
+    <span style="display:table-cell;font-weight:500;">{{ date_formatted }}</span>
+  </div>
+  <div style="display:table;width:100%;padding:7px 0;border-bottom:1px solid #eef0f8;font-size:13px;">
+    <span style="display:table-cell;color:#555555;width:45%">Time</span>
+    <span style="display:table-cell;font-weight:500;">{{ cruise_time }}</span>
+  </div>
+  <div style="display:table;width:100%;padding:7px 0;border-bottom:1px solid #eef0f8;font-size:13px;">
+    <span style="display:table-cell;color:#555555;width:45%">Adults (10+)</span>
+    <span style="display:table-cell;font-weight:500;">{{ adults_count }} × €{{ booking.adult_unit_price }} = <strong>€{{ adult_total }}</strong></span>
+  </div>
+  {% if children_count %}
+  <div style="display:table;width:100%;padding:7px 0;border-bottom:1px solid #eef0f8;font-size:13px;">
+    <span style="display:table-cell;color:#555555;width:45%">Children (3–10)</span>
+    <span style="display:table-cell;font-weight:500;">{{ children_count }} × €{{ booking.child_unit_price }} = <strong>€{{ child_total }}</strong></span>
+  </div>
+  {% endif %}
+  {% if booking.customer_notes %}
+  <div style="display:table;width:100%;padding:7px 0;font-size:13px;">
+    <span style="display:table-cell;color:#555555;width:45%">Notes</span>
+    <span style="display:table-cell;font-weight:500;">{{ booking.customer_notes }}</span>
+  </div>
+  {% endif %}
+</div>
+
+<hr style="border:none;border-top:1px solid #d0d4e8;margin:20px 0;">
+
+<p style="font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#096d8e;margin:0 0 12px;">Payment</p>
+<div style="background:#f3f4fb;border-radius:10px;padding:16px 18px;">
+  <div style="display:table;width:100%;padding:7px 0;font-size:13px;">
+    <span style="display:table-cell;color:#555555;width:45%">Total paid</span>
+    <span style="display:table-cell;font-weight:700;font-size:16px;color:#096d8e;">€{{ total_amount }}</span>
+  </div>
+</div>
+
+<hr style="border:none;border-top:1px solid #d0d4e8;margin:20px 0;">
+
+<p style="font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#096d8e;margin:0 0 12px;">How to find the boat</p>
+<div style="background:#f3f4fb;border-radius:10px;padding:16px 18px;">
+  <p style="font-size:13px;margin:0 0 4px;">We are located in <strong>{{ meeting_point }}</strong></p>
+  <p style="font-size:12px;color:#666666;margin:0 0 10px;">(!) Please don't confuse it with Ayia Napa Marina</p>
+  <a href="https://maps.google.com/?q=Ayia+Napa+Harbour+Limanaki" style="display:block;background:#096d8e;color:#ffffff;text-align:center;border-radius:8px;padding:11px 16px;font-size:13px;font-weight:500;text-decoration:none;">Open Google Maps →</a>
+</div>
+
+<hr style="border:none;border-top:1px solid #d0d4e8;margin:20px 0;">
+
+<p style="font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#096d8e;margin:0 0 12px;">Questions or date change?</p>
+<div style="background:#f3f4fb;border-radius:10px;padding:14px 18px;font-size:13px;">
+  <p style="margin:0 0 6px;color:#555555;">Email: <a href="mailto:{{ support_email }}" style="color:#096d8e;text-decoration:none;">{{ support_email }}</a></p>
+  {% if support_phone %}<p style="margin:0;color:#555555;">Phone: <a href="tel:{{ support_phone }}" style="color:#096d8e;text-decoration:none;">{{ support_phone }}</a></p>{% endif %}
+</div>
+
+<p style="font-size:14px;font-weight:500;margin:24px 0 4px;">See you on the water! 🌊</p>
+<p style="font-size:13px;color:#555555;margin:0;">TURTLE CRUISE by SCUBACAT</p>
+{% endblock %}

@@ -1,0 +1,43 @@
+{% load cms_extras %}
+<section class="section faq faq-page"{% if d.block_id %} id="{{ d.block_id }}"{% endif %}>
+  <div class="container">
+    {% if d.title or d.subtitle %}
+    <div class="faq-page__header">
+      {% if d.title %}<div class="col"><h1>{{ d.title|safe }}</h1></div>{% endif %}
+      {% if d.subtitle %}<div class="col"><p class="faq__subtitle">{{ d.subtitle }}</p></div>{% endif %}
+    </div>
+    {% endif %}
+    {% if d.columns %}
+    <div class="faq__grid">
+      {% for column in d.columns %}
+      <div class="col">
+        {% for group in column.groups %}
+        <div class="faq__col">
+          {% if group.title %}<h3 class="faq__col-title"><em>{{ group.title }}</em></h3>{% endif %}
+          {% if group.items %}
+          <div class="faq__list">
+            {% for item in group.items %}
+            <div class="faq__item">
+              <button class="faq__question" type="button">
+                <span>{{ item.question }}</span>
+                <div class="faq__arrow"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"><rect width="24" height="24" rx="12" fill="#F3F4FB"/><path d="M19.0153 13.7653L12.2653 20.5153L4.98471 13.7653C4.91435 13.6949 4.87482 13.5 4.98471 13.2347C5.05508 13.1643 5.25003 13.1248 5.51534 13.2347L11.625 19.3444V3.75H12V19.3444L18.4847 13.2347C19.0153 13.7653Z" fill="black"/></svg></div>
+              </button>
+              <div class="faq__answer"><p>{{ item.answer }}</p></div>
+            </div>
+            {% endfor %}
+          </div>
+          {% endif %}
+        </div>
+        {% endfor %}
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+    {% if d.footer_text or d.footer_link %}
+    <div class="faq__footer">
+      {% if d.footer_text %}<p>{{ d.footer_text }}</p>{% endif %}
+      {% if d.footer_link %}<div><a href="{{ d.footer_link.url }}" class="faq__btn"{% if d.footer_link.target %} target="{{ d.footer_link.target }}"{% endif %}>{{ d.footer_link.title }}</a></div>{% endif %}
+    </div>
+    {% endif %}
+  </div>
+</section>

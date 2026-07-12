@@ -1,0 +1,38 @@
+{% load cms_extras %}
+<section class="section faq"{% if d.block_id %} id="{{ d.block_id }}"{% endif %}>
+  <div class="container">
+    {% if d.title or d.subtitle %}
+    <div class="faq__header">
+      {% if d.title %}<div class="col"><h2>{{ d.title|safe }}</h2></div>{% endif %}
+      {% if d.subtitle %}<div class="col"><p class="faq__subtitle">{{ d.subtitle }}</p></div>{% endif %}
+    </div>
+    {% endif %}
+    {% if d.columns %}
+    <div class="faq__grid">
+      {% for column in d.columns %}
+      <div class="faq__col">
+        {% if column.title %}<h3 class="faq__col-title"><em>{{ column.title }}</em></h3>{% endif %}
+        {% if column.items %}
+        <div class="faq__list">
+          {% for item in column.items %}
+          <div class="faq__item">
+            <button class="faq__question" type="button">
+              <span>{{ item.question }}</span>
+              <div class="faq__arrow"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"><rect width="24" height="24" rx="12" fill="#F3F4FB"/><path d="M19.0153 13.7653L12.2653 20.5153C12.2305 20.5502 12.1892 20.5778 12.1436 20.5967C12.0981 20.6156 12.0493 20.6253 12 20.6253C11.9507 20.6253 11.9019 20.6156 11.8564 20.5967C11.8109 20.5778 11.7695 20.5502 11.7347 20.5153L4.98471 13.7653C4.91435 13.6949 4.87482 13.5995 4.87482 13.5C4.87482 13.4005 4.91435 13.3051 4.98471 13.2347C5.05508 13.1643 5.15051 13.1248 5.25003 13.1248C5.34954 13.1248 5.44497 13.1643 5.51534 13.2347L11.625 19.3444V3.75C11.625 3.65054 11.6645 3.55516 11.7349 3.48484C11.8052 3.41451 11.9006 3.375 12 3.375C12.0995 3.375 12.1949 3.41451 12.2652 3.48484C12.3355 3.55516 12.375 3.65054 12.375 3.75V19.3444L18.4847 13.2347C18.5551 13.1643 18.6505 13.1248 18.75 13.1248C18.8495 13.1248 18.945 13.1643 19.0153 13.2347C19.0857 13.3051 19.1252 13.4005 19.1252 13.5C19.1252 13.5995 19.0857 13.6949 19.0153 13.7653Z" fill="black"/></svg></div>
+            </button>
+            <div class="faq__answer"><p>{{ item.answer }}</p></div>
+          </div>
+          {% endfor %}
+        </div>
+        {% endif %}
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+    {% if d.footer_link %}
+    <div class="faq__footer">
+      <a href="{{ d.footer_link.url }}" class="faq__btn"{% if d.footer_link.target %} target="{{ d.footer_link.target }}"{% endif %}>{{ d.footer_link.title }}</a>
+    </div>
+    {% endif %}
+  </div>
+</section>

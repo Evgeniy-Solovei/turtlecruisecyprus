@@ -1,0 +1,32 @@
+{% load cms_extras %}
+<section class="yacht"{% if d.block_id %} id="{{ d.block_id }}"{% endif %}>
+  <div class="container">
+    <div class="yacht__inner">
+      {% if d.icon or d.title %}
+      <div class="yacht__header">
+        {% if d.icon %}<div class="yacht__icon"><img src="{% media d.icon %}" alt=""></div>{% endif %}
+        {% if d.title %}<h2 class="yacht__title">{{ d.title }}</h2>{% endif %}
+      </div>
+      {% endif %}
+      {% if d.features %}
+      <div class="yacht__features">
+        {% for feature in d.features %}
+        {% if feature.label %}
+        <div class="yacht__feature">
+          {% if feature.icon_1 %}<img src="{% media feature.icon_1 %}" alt="">{% endif %}
+          {% if feature.icon_2 %}<img src="{% media feature.icon_2 %}" alt="">{% endif %}
+          <span>{{ feature.label }}</span>
+        </div>
+        {% endif %}
+        {% endfor %}
+      </div>
+      {% endif %}
+      {% if d.notes_text or d.button_text %}
+      <div class="yacht__notes">
+        {% if d.notes_text %}<p>{{ d.notes_text }}</p>{% endif %}
+        {% if d.button_text %}<a href="{{ d.button_url|default:'#' }}" class="yacht__btn" data-fancybox data-type="iframe">{{ d.button_text }}</a>{% endif %}
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</section>

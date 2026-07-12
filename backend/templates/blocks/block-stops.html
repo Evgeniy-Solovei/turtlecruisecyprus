@@ -1,0 +1,33 @@
+{% load cms_extras static %}
+<section class="stops"{% if d.block_id %} id="{{ d.block_id }}"{% endif %}>
+  <div class="container">
+    <div class="stops__inner">
+      {% if d.icon or d.title %}
+      <div class="stops__header">
+        {% if d.icon %}<div class="stops__icon"><img src="{% media d.icon %}" alt=""></div>{% endif %}
+        {% if d.title %}<h2 class="stops__title">{{ d.title }}</h2>{% endif %}
+      </div>
+      {% endif %}
+      {% if d.cards %}
+      <div class="stops__grid">
+        {% for card in d.cards %}
+        {% if card.name %}
+        <div class="stops__card">
+          <div class="stops__img">{% if card.image %}<img src="{% media card.image %}" alt="{{ card.name }}">{% endif %}</div>
+          <div class="stops__meta">
+            <span class="stops__name">{{ card.name }}</span>
+            {% if card.duration %}
+            <span class="stops__duration">
+              <img src="{% static 'frontend/img/dist/stop-timer.svg' %}" alt="">
+              {{ card.duration }}
+            </span>
+            {% endif %}
+          </div>
+        </div>
+        {% endif %}
+        {% endfor %}
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</section>

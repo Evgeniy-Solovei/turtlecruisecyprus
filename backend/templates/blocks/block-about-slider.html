@@ -1,0 +1,13 @@
+{% load cms_extras %}
+<section class="section about-slider{% if d.layout == 'content_first' %} private-content{% endif %}"{% if d.block_id %} id="{{ d.block_id }}"{% endif %}>
+  <div class="container">
+    {% if d.tagline %}<h2 class="about-slider__tagline">{{ d.tagline }}</h2>{% endif %}
+    {% if d.layout == 'content_first' %}
+      {% include "blocks/includes/about-slider-content.html" %}
+      {% include "blocks/includes/about-slider-slides.html" %}
+    {% else %}
+      {% include "blocks/includes/about-slider-slides.html" %}
+      {% include "blocks/includes/about-slider-content.html" %}
+    {% endif %}
+  </div>
+</section>

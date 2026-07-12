@@ -1,0 +1,125 @@
+/* Mobile UX improvements on top of WP main.min.css */
+@media (max-width: 767.98px) {
+  .navbar__book span {
+    font-size: 12px;
+  }
+
+  .hero__tours {
+    gap: 12px;
+  }
+
+  .hero__tour {
+    width: 100%;
+  }
+
+  .tc-popup__window {
+    width: 100%;
+    max-width: 100%;
+    height: 100dvh;
+    max-height: 100dvh;
+    border-radius: 0;
+  }
+
+  .tc-popup__body {
+    padding-bottom: calc(12px + env(safe-area-inset-bottom));
+  }
+
+  .book__btn,
+  .navbar__book {
+    min-height: 44px;
+  }
+
+  .nav-overlay__link {
+    font-size: 28px;
+    line-height: 1.2;
+  }
+
+  .legal-page__content {
+    padding: 24px 0 40px;
+  }
+
+  .legal-page__content h1 {
+    font-size: 28px;
+    margin-bottom: 16px;
+  }
+}
+
+/* Gallery page: keep 4 masonry columns; theme JS batches/hides items and breaks the grid. */
+body.gallery .section.gallery .gallery__masonry--static {
+  display: grid !important;
+  grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  gap: 1.875rem !important;
+  align-items: start !important;
+}
+
+body.gallery .section.gallery .gallery__masonry--static::before,
+body.gallery .section.gallery .gallery__masonry--static::after {
+  display: none !important;
+}
+
+body.gallery .section.gallery .gallery__col {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 1.5rem !important;
+}
+
+body.gallery .section.gallery .gallery__col:nth-child(1),
+body.gallery .section.gallery .gallery__col:nth-child(3) {
+  margin-top: 1.6875rem !important;
+}
+
+body.gallery .section.gallery .gallery__item {
+  display: block !important;
+  opacity: 1 !important;
+  transform: none !important;
+  visibility: visible !important;
+}
+
+body.gallery .section.gallery .flex-load {
+  display: none !important;
+}
+
+@media (max-width: 991.98px) {
+  body.gallery .section.gallery .gallery__masonry--static {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 0 1.5rem !important;
+  }
+
+  body.gallery .section.gallery .gallery__col:nth-child(1),
+  body.gallery .section.gallery .gallery__col:nth-child(3) {
+    margin-top: 0 !important;
+  }
+}
+
+@media (max-width: 767.98px) {
+  body.gallery .section.gallery .gallery__masonry--static {
+    grid-template-columns: 1fr !important;
+    padding: 0 14px !important;
+  }
+}
+
+.gallery .gallery-load.gallery__masonry::before,
+.gallery .gallery-load.gallery__masonry::after {
+  display: none !important;
+}
+
+.whatsapp-float {
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
+  z-index: 9000;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: #25d366;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+}
+
+.whatsapp-float:hover {
+  color: #fff;
+  background: #1ebe57;
+}

@@ -1,0 +1,16 @@
+{% load static %}
+<section class="section book" id="book">
+  <div class="bg-block">
+    <img src="{% static 'frontend/img/dist/book-bg.jpg' %}" class="d-none d-md-block" alt="">
+    <img src="{% static 'frontend/img/dist/book-mob-bg.jpg' %}" class="d-block d-md-none" alt="">
+    <div class="book__gradient"></div>
+  </div>
+  <div class="container">
+    <div class="book__inner">
+      <h2 class="book__title">{{ t.book_section_title|default:"Book your cruise" }}</h2>
+      <p class="book__subtitle">{{ t.book_section_sub|default:"Ready to dive in?" }}</p>
+      <button type="button" class="book__btn" data-cruise-open>{{ t.book_now|default:"BOOK NOW" }}</button>
+      <p class="book__note">{{ t.book_note|linebreaksbr }}</p>
+    </div>
+  </div>
+</section>

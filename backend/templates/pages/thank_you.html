@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}{{ t.thank_you_title }} — Turtle Cruise Cyprus{% endblock %}
+{% block content %}
+<section class="section cruise-content">
+  <div class="container">
+    <div class="content">
+      <h2 class="cruise-content__lead">{{ t.thank_you_title }}</h2>
+      <div class="cruise-content__text"><p>{{ t.thank_you_text }}</p></div>
+    </div>
+  </div>
+</section>
+{% include "pages/wp/partials/book_block.html" %}
+{% endblock %}
+{% block extra_js %}
+<script>
+(function() {
+  var bookingId = localStorage.getItem('tc_pending_booking_id');
+  var params = new URLSearchParams(window.location.search);
+  var sessionId = params.get('session_id');
+  if (!sessionId && !bookingId) return;
+  localStorage.removeItem('tc_pending_booking_id');
+  function csrf() {
+    var m = document.cookie.match(/csrftoken=([^;]+)/);
+    return m ? decodeURIComponent(m[1]) : '';
+  }
+  fetch('/api/v1/payments/stripe/confirm/', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json', 'X-CSRFToken': csrf()},
+    body: JSON.stringify({booking_id: bookingId || '', checkout_session_id: sessionId || ''})
+  });
+})();
+</script>
+{% endblock %}

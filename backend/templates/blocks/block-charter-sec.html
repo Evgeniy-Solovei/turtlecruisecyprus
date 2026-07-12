@@ -1,0 +1,31 @@
+{% load cms_extras %}
+<section class="section charter-sec"{% if d.block_id %} id="{{ d.block_id }}"{% endif %}>
+  <div class="container">
+    <div class="d-block d-md-none">
+      {% if d.title %}<h2 class="charter-card__title">{{ d.title|safe }}</h2>{% endif %}
+      {% if d.subtitle %}<div class="subtitle">{{ d.subtitle }}</div>{% endif %}
+    </div>
+    <div class="charter-card">
+      <div class="bg-block">
+        {% if d.image %}<img src="{% media d.image %}" alt="">{% endif %}
+        <div class="charter-card__gradient"></div>
+      </div>
+      <div class="charter-card__inner">
+        <div class="d-none d-md-block">{% if d.title %}<h2 class="charter-card__title">{{ d.title|safe }}</h2>{% endif %}</div>
+        {% if d.desc %}
+        <p class="charter-card__desc"><span>{{ d.desc|safe }}</span>{{ d.desc_highlight|safe }}</p>
+        {% endif %}
+        {% if d.link %}
+        <div class="d-none d-md-block">
+          <a href="{{ d.link.url }}" class="charter-card__btn"{% if d.link.target %} target="{{ d.link.target }}"{% endif %}>{{ d.link.title }}</a>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+    {% if d.link %}
+    <div class="d-block d-md-none">
+      <a href="{{ d.link.url }}" class="charter-card__btn"{% if d.link.target %} target="{{ d.link.target }}"{% endif %}>{{ d.link.title }}</a>
+    </div>
+    {% endif %}
+  </div>
+</section>

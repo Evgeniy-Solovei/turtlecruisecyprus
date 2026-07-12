@@ -1,0 +1,25 @@
+{% load cms_extras %}
+<section class="section cruise-content"{% if d.block_id %} id="{{ d.block_id }}"{% endif %}>
+  <div class="container">
+    <div class="content">
+      {% if d.lead %}<h2 class="cruise-content__lead">{{ d.lead|safe }}</h2>{% endif %}
+      {% if d.content %}<div class="cruise-content__text">{{ d.content|safe }}</div>{% endif %}
+      {% if d.card_title or d.card_price %}
+        {% if d.cruise_open2 and d.cruise_open2 != "— Use URL —" %}
+          <button type="button" class="cruise-content__card" data-cruise-open="{{ d.cruise_open2 }}">
+        {% else %}
+          <a href="{{ d.card_link|default:'#book' }}" class="cruise-content__card">
+        {% endif %}
+          {% if d.card_image %}<div class="cruise-content__card-img"><img src="{% media d.card_image %}" alt=""></div>{% endif %}
+          <div class="cruise-content__card-info">
+            {% if d.card_title %}<h3>{{ d.card_title|safe }}</h3>{% endif %}
+            {% if d.card_time %}<div class="cruise-content__card-time"><span>{{ d.card_time }}</span></div>{% endif %}
+            {% if d.card_desc %}<p>{{ d.card_desc }}</p>{% endif %}
+          </div>
+          {% if d.card_price %}<div class="cruise-content__card-price"><div class="price"><span>€</span>{{ d.card_price }}</div></div>{% endif %}
+        {% if d.cruise_open2 and d.cruise_open2 != "— Use URL —" %}</button>{% else %}</a>{% endif %}
+      {% endif %}
+      {% if d.final %}<div class="cruise-content__final">{{ d.final|safe }}</div>{% endif %}
+    </div>
+  </div>
+</section>

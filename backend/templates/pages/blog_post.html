@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}{{ post.title }} — Turtle Cruise Cyprus{% endblock %}
+{% block content %}
+<section class="section post-hero">
+  <div class="container">
+    <nav class="post-hero__breadcrumb">
+      <span>{{ t.blog_breadcrumb }}</span>
+      <img src="{% static 'frontend/img/dist/wave.svg' %}" alt="">
+      <a href="{{ blog_url }}">{{ post.title }}</a>
+    </nav>
+    <div class="post-hero__header">
+      <h1>{{ post.title }}</h1>
+    </div>
+  </div>
+  {% if post.image_url %}
+  <div class="image object-fit">
+    <img src="{{ post.image_url }}" alt="{{ post.title }}">
+  </div>
+  {% endif %}
+</section>
+
+<section class="section post-content">
+  <div class="container">
+    <div class="content">
+      {{ post.body|safe }}
+    </div>
+  </div>
+</section>
+
+{% if related_posts %}
+<section class="section blog related-post">
+  <div class="container">
+    <h2>{{ t.related_articles }}</h2>
+    <div class="flex">
+      {% include "includes/blog_cards.html" with posts=related_posts %}
+    </div>
+  </div>
+</section>
+{% endif %}
+
+{% include "pages/wp/partials/book_block.html" %}
+{% endblock %}

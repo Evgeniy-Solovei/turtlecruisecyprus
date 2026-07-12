@@ -1,0 +1,14 @@
+{% load cms_extras %}
+<section class="add-info"{% if d.block_id %} id="{{ d.block_id }}"{% endif %}>
+  <div class="container">
+    <div class="add-info__inner">
+      {% if d.icon or d.title %}
+      <div class="add-info__header">
+        {% if d.icon %}<div class="add-info__icon"><img src="{% media d.icon %}" alt=""></div>{% endif %}
+        {% if d.title %}<h2 class="add-info__title">{{ d.title }}</h2>{% endif %}
+      </div>
+      {% endif %}
+      {% if d.notes %}<div class="add-info__notes">{{ d.notes|safe }}</div>{% endif %}
+    </div>
+  </div>
+</section>

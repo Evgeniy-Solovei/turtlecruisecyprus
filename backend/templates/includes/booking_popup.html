@@ -1,0 +1,174 @@
+<div class="tc-popup" id="tcPopup" aria-modal="true" role="dialog" aria-label="{{ t.aria_booking_dialog }}">
+  <div class="tc-popup__overlay" id="tcPopupOverlay"></div>
+  <div class="tc-popup__window">
+    <div class="tc-popup__header">
+      <div class="tc-popup__header-title">{{ t.popup_title }}</div>
+      <div class="tc-popup__steps">
+        <div class="tc-popup__step active" data-step="1"><span class="tc-popup__step-num">1</span><span class="tc-popup__step-label">{{ t.step_date }}</span></div>
+        <div class="tc-popup__step-divider"></div>
+        <div class="tc-popup__step" data-step="2"><span class="tc-popup__step-num">2</span><span class="tc-popup__step-label">{{ t.step_details }}</span></div>
+        <div class="tc-popup__step-divider"></div>
+        <div class="tc-popup__step" data-step="3"><span class="tc-popup__step-num">3</span><span class="tc-popup__step-label">{{ t.step_payment }}</span></div>
+      </div>
+      <button class="tc-popup__close" id="tcPopupClose" aria-label="{{ t.aria_close }}" type="button">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M15 5L5 15M5 5l10 10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+
+    <div class="tc-popup__body">
+      <div class="tc-step" id="tcStep1">
+        <div class="tc-step__layout">
+          <div class="tc-step__form">
+            <div class="tc-field">
+              <label class="tc-field__label">{{ t.select_date }} <span class="tc-required">{{ t.required_marker }}</span></label>
+              <div class="tc-field__input-wrap tc-field__input-wrap--icon">
+                <input type="date" class="tc-input" id="tcDate" name="cruise_date" required>
+              </div>
+            </div>
+            <div class="tc-field">
+              <label class="tc-field__label">{{ t.select_cruise }} <span class="tc-required">{{ t.required_marker }}</span></label>
+              <div class="tc-cruise-options">
+                {% for card in cruise_cards %}
+                <label class="tc-cruise-option">
+                  <input type="radio" name="cruise_type" value="{{ card.code }}" class="tc-cruise-option__radio">
+                  <div class="tc-cruise-option__card">
+                    <div class="tc-cruise-option__info">
+                      <div class="tc-cruise-option__name">{{ card.name }}</div>
+                      <div class="tc-cruise-option__time">{{ card.time_label }}</div>
+                    </div>
+                    <div class="tc-cruise-option__price">
+                      {% if card.child_price %}{{ card.child_price }}/{% endif %}{{ card.adult_price }}€
+                    </div>
+                  </div>
+                </label>
+                {% endfor %}
+              </div>
+            </div>
+            <div class="tc-passengers">
+              <div class="tc-field tc-field--counter">
+                <div class="tc-field__label-row">
+                  <label class="tc-field__label">{{ t.adults }} <span class="tc-field__age">{{ t.adults_age }}</span> <span class="tc-required">{{ t.required_marker }}</span></label>
+                  <div class="tc-field__price-hint" id="tcAdultsPrice">€0 {{ t.per_person }}</div>
+                </div>
+                <div class="tc-counter">
+                  <button type="button" class="tc-counter__btn tc-counter__btn--minus" data-target="tcAdultsVal">−</button>
+                  <span class="tc-counter__val" id="tcAdultsVal">1</span>
+                  <button type="button" class="tc-counter__btn tc-counter__btn--plus" data-target="tcAdultsVal">+</button>
+                </div>
+              </div>
+              <div class="tc-field tc-field--counter" id="tcChildrenField">
+                <div class="tc-field__label-row">
+                  <label class="tc-field__label">{{ t.children }} <span class="tc-field__age">{{ t.children_age }}</span></label>
+                  <div class="tc-field__price-hint" id="tcChildrenPrice">€0 {{ t.per_person }}</div>
+                </div>
+                <div class="tc-counter">
+                  <button type="button" class="tc-counter__btn tc-counter__btn--minus" data-target="tcChildrenVal">−</button>
+                  <span class="tc-counter__val" id="tcChildrenVal">0</span>
+                  <button type="button" class="tc-counter__btn tc-counter__btn--plus" data-target="tcChildrenVal">+</button>
+                </div>
+              </div>
+            </div>
+            <div class="tc-terms">
+              <button type="button" class="tc-terms__toggle" id="tcTermsToggle"><span>{{ t.terms_title }}</span></button>
+              <div class="tc-terms__body" id="tcTermsBody">
+                <ul class="tc-terms__list">
+                  <li>{{ t.term_1 }}</li>
+                  <li>{{ t.term_2 }}</li>
+                  <li>{{ t.term_3 }}</li>
+                  <li>{{ t.term_4 }}</li>
+                  <li>{{ t.term_5 }}</li>
+                  <li>{{ t.term_6 }}</li>
+                </ul>
+              </div>
+              <label class="tc-checkbox">
+                <input type="checkbox" id="tcTermsAgree" name="terms_agree">
+                <span class="tc-checkbox__box"></span>
+                <span class="tc-checkbox__label">{{ t.agree_terms }}</span>
+              </label>
+            </div>
+          </div>
+          <div class="tc-step__summary">
+            <div class="tc-summary tc-summary--placeholder" id="tcSummaryPlaceholder"><p>{{ t.select_hint }}</p></div>
+            <div class="tc-summary tc-summary--filled" id="tcSummaryFilled" style="display:none">
+              <div class="tc-summary__title" id="tcSummaryTitle"></div>
+              <div class="tc-summary__meta" id="tcSummaryMeta"></div>
+              <div class="tc-summary__route" id="tcSummaryRoute"></div>
+              <div class="tc-summary__desc" id="tcSummaryDesc"></div>
+              <div class="tc-summary__prices" id="tcSummaryPrices"></div>
+            </div>
+          </div>
+        </div>
+        <div class="tc-step__footer">
+          <div class="tc-total"><span class="tc-total__label">{{ t.total }}</span><span class="tc-total__amount" id="tcTotalAmount">€0</span></div>
+          <button type="button" class="tc-btn tc-btn--primary" id="tcStep1Next">{{ t.checkout }}</button>
+        </div>
+      </div>
+
+      <div class="tc-step" id="tcStep2" style="display:none">
+        <div class="tc-step__layout">
+          <div class="tc-step__form">
+            <div class="tc-fields-row">
+              <div class="tc-field"><label class="tc-field__label">{{ t.first_name }} {{ t.required_marker }}</label><input type="text" class="tc-input" id="tcFirstName"></div>
+              <div class="tc-field"><label class="tc-field__label">{{ t.last_name }} {{ t.required_marker }}</label><input type="text" class="tc-input" id="tcLastName"></div>
+            </div>
+            <div class="tc-fields-row">
+              <div class="tc-field"><label class="tc-field__label">{{ t.email }} {{ t.required_marker }}</label><input type="email" class="tc-input" id="tcEmail"></div>
+              <div class="tc-field"><label class="tc-field__label">{{ t.phone }} {{ t.required_marker }}</label><input type="tel" class="tc-input" id="tcPhone"></div>
+            </div>
+            <div class="tc-field"><label class="tc-field__label">{{ t.notes }} {{ t.optional_hint }}</label><textarea class="tc-input tc-input--textarea" id="tcNotes" rows="3"></textarea></div>
+            <p class="tc-required-note">{{ t.required_marker }} {{ t.required_fields }}</p>
+          </div>
+          <div class="tc-step__summary">
+            <div class="tc-summary tc-summary--filled">
+              <div class="tc-summary__title" id="tcStep2SummaryTitle"></div>
+              <div class="tc-summary__meta" id="tcStep2SummaryMeta"></div>
+              <div class="tc-summary__route" id="tcStep2SummaryRoute"></div>
+              <div class="tc-summary__line"><span id="tcStep2Adults"></span></div>
+              <div class="tc-summary__line" id="tcStep2ChildrenLine"><span id="tcStep2Children"></span></div>
+              <div class="tc-summary__total">{{ t.total }} <strong id="tcStep2Total"></strong></div>
+            </div>
+          </div>
+        </div>
+        <div class="tc-step__footer">
+          <button type="button" class="tc-btn tc-btn--secondary" id="tcStep2Back">{{ t.back }}</button>
+          <button type="button" class="tc-btn tc-btn--primary" id="tcStep2Next">{{ t.checkout }}</button>
+        </div>
+      </div>
+
+      <div class="tc-step" id="tcStep3" style="display:none">
+        <div class="tc-step__layout">
+          <div class="tc-step__form">
+            <div class="tc-stripe-wrap" id="tcStripeWrap">
+              <div id="tc-stripe-placeholder" class="tc-stripe-placeholder"><div class="tc-stripe-placeholder__inner">{{ t.loading_payment }}</div></div>
+              <div id="tc-express-checkout-wrap" style="display:none"><div id="tc-express-checkout-element"></div></div>
+              <div id="tc-payment-element"></div>
+              <div id="tc-payment-errors" class="tc-payment-errors" role="alert"></div>
+            </div>
+          </div>
+          <div class="tc-step__summary">
+            <div class="tc-summary tc-summary--filled">
+              <div class="tc-summary__title" id="tcStep3SummaryTitle"></div>
+              <div class="tc-summary__meta" id="tcStep3SummaryMeta"></div>
+              <div class="tc-summary__route" id="tcStep3SummaryRoute"></div>
+              <div class="tc-summary__person" id="tcStep3Person"></div>
+              <div class="tc-summary__email" id="tcStep3Email"></div>
+              <div class="tc-summary__total">{{ t.total }} <strong id="tcStep3Total"></strong></div>
+            </div>
+          </div>
+        </div>
+        <div class="tc-step__footer">
+          <button type="button" class="tc-btn tc-btn--secondary" id="tcStep3Back">{{ t.back }}</button>
+          <button type="button" class="tc-btn tc-btn--primary" id="tcPlaceOrder" style="display:none;">{{ t.place_order }}</button>
+        </div>
+      </div>
+
+      <div class="tc-step tc-step--success" id="tcStepSuccess" style="display:none">
+        <div class="tc-success">
+          <h2 class="tc-success__title">{{ t.payment_success_title }}</h2>
+          <p class="tc-success__text">{{ t.payment_success_text }}</p>
+          <button type="button" class="tc-btn tc-btn--primary" id="tcSuccessClose">{{ t.close }}</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

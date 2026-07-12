@@ -1,0 +1,35 @@
+{% load cms_extras %}
+<section class="section offers"{% if d.block_id %} id="{{ d.block_id }}"{% endif %}>
+  <div class="container">
+    {% if d.items %}
+    <div class="offers__grid">
+      {% for item in d.items %}
+      <div class="offers__card">
+        <div class="bg-block">
+          {% if item.image %}<img src="{% media item.image %}" alt="">{% endif %}
+          <div class="offers__gradient"></div>
+        </div>
+        {% if item.card_link %}<a class="card-link" href="{{ item.card_link }}"></a>{% endif %}
+        <div class="offers__card-inner">
+          <div class="offers__card-top">
+            {% if item.title %}<h2 class="offers__title">{{ item.title|safe }}</h2>{% endif %}
+            {% if item.time %}<div class="offers__time"><span>{{ item.time }}</span></div>{% endif %}
+          </div>
+          <div class="offers__card-body">
+            {% if item.desc %}<p>{{ item.desc }}</p>{% endif %}
+            {% if item.price %}<span class="offers__price">{{ item.price }}</span>{% endif %}
+          </div>
+        </div>
+        {% if item.btn_label %}
+          {% if item.booking_trigger == "morning" or item.booking_trigger == "sunset" %}
+          <button type="button" data-cruise-open="{{ item.booking_trigger }}" class="offers__btn"><span>{{ item.btn_label }}</span></button>
+          {% else %}
+          <a href="{{ item.card_link|default:'#' }}" class="offers__btn"><span>{{ item.btn_label }}</span></a>
+          {% endif %}
+        {% endif %}
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+  </div>
+</section>

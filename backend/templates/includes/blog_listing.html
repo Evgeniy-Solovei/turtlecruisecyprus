@@ -1,0 +1,20 @@
+{% load cms_extras %}
+<section class="section blog-page">
+  <div class="container">
+    <div class="blog-page__header">
+      <h1>Blog</h1>
+      <p>Stories, tips and guides about turtle cruises in Cyprus.</p>
+    </div>
+    {% blog_page_posts 9 "Load MORE" as blog_data %}
+    <div class="row blog-page__grid" id="blogGrid">
+      {% include "includes/blog_cards.html" with posts=blog_data.posts %}
+    </div>
+    {% if blog_data.has_more %}
+    <div class="blog-page__more">
+      <button type="button" class="btn btn--primary" id="blogLoadMore" data-page="1" data-max="{{ blog_data.max_pages }}">
+        {{ blog_data.load_more_label }}
+      </button>
+    </div>
+    {% endif %}
+  </div>
+</section>

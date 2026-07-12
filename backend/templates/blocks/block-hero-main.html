@@ -1,0 +1,62 @@
+{% load cms_extras static %}
+<section class="section hero"{% if d.block_id %} id="{{ d.block_id }}"{% endif %}>
+  <div class="bg-block">
+    {% if d.bg_video %}
+    <video autoplay muted loop playsinline>
+      <source src="{{ d.bg_video }}" type="video/mp4">
+    </video>
+    {% else %}
+      {% if d.bg_image %}<img src="{% media d.bg_image %}" class="d-none d-md-block" alt="">{% endif %}
+      {% if d.bg_image_mob %}<img src="{% media d.bg_image_mob %}" class="d-block d-md-none" alt="">{% elif d.bg_image %}<img src="{% media d.bg_image %}" class="d-block d-md-none" alt="">{% endif %}
+    {% endif %}
+    <div class="hero__gradient"></div>
+  </div>
+  <div class="container">
+    <nav class="hero__breadcrumb">
+      <span>Blue Lagoon</span>
+      <img src="{% static 'frontend/img/dist/wave.svg' %}" alt="">
+      <span>Ayia Napa</span>
+      <img src="{% static 'frontend/img/dist/wave.svg' %}" alt="">
+      <span>Boat Trip</span>
+    </nav>
+    <div class="hero__center">
+      {% if d.rating_num or d.rating_label %}
+      {% if d.rating_url %}<a href="{{ d.rating_url }}" target="_blank" rel="noopener noreferrer" class="hero__rating">{% else %}<div class="hero__rating">{% endif %}
+        {% if d.rating_num %}<span class="hero__rating-num">{{ d.rating_num }}</span>{% endif %}
+        <div class="hero__rating-right">
+          <div class="hero__stars">★★★★★</div>
+          {% if d.rating_label %}<span class="hero__rating-label">{{ d.rating_label }}</span>{% endif %}
+        </div>
+      {% if d.rating_url %}</a>{% else %}</div>{% endif %}
+      {% endif %}
+      <div class="hero__titles">
+        {% if d.title %}<h1>{{ d.title|safe }}</h1>{% endif %}
+        {% if d.subtitle %}<p class="hero__sub">{{ d.subtitle }}</p>{% endif %}
+      </div>
+    </div>
+    {% if d.tours %}
+    <div class="hero__cruises">
+      <p class="hero__choose">{{ d.choose_label|default:"Choose your cruise" }}</p>
+      <div class="hero__tours">
+        {% for tour in d.tours %}
+        {% if tour.cruise_open %}
+        <button type="button" class="hero__tour" data-cruise-open="{{ tour.cruise_open }}">
+        {% else %}
+        <a href="{{ tour.url|default:'#' }}" class="hero__tour">
+        {% endif %}
+          {% if tour.image %}<div class="hero__tour-img"><img src="{% media tour.image %}" alt=""></div>{% endif %}
+          <div class="hero__tour-info">
+            {% if tour.title %}<h3>{{ tour.title|safe }}</h3>{% endif %}
+            <div class="hero__tour-meta">
+              {% if tour.time %}<div class="hero__tour-time"><span>{{ tour.time }}</span></div>{% endif %}
+              {% if tour.desc %}<p>{{ tour.desc }}</p>{% endif %}
+            </div>
+          </div>
+          {% if tour.price %}<div class="hero__tour-price"><div class="price"><span>€</span>{{ tour.price }}</div></div>{% endif %}
+        {% if tour.cruise_open %}</button>{% else %}</a>{% endif %}
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+  </div>
+</section>

@@ -1,0 +1,24 @@
+{% load cms_extras static %}
+<section class="section why-private"{% if d.block_id %} id="{{ d.block_id }}"{% endif %}>
+  <div class="container">
+    {% if d.title %}<h2 class="why-private__title">{{ d.title }}</h2>{% endif %}
+    {% if d.items %}
+    <div class="why-private__grid">
+      {% for item in d.items %}
+      <div class="why-private__col">
+        <div class="why-private__item">
+          {% if item.title %}<h3>{{ item.title }}</h3>{% endif %}
+          {% if item.text %}<p>{{ item.text }}</p>{% endif %}
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+    {% if d.cta_text or d.cta_link %}
+    <div class="why-private__cta">
+      {% if d.cta_text %}<p>{{ d.cta_text|linebreaksbr }}</p>{% endif %}
+      {% if d.cta_link %}<a href="{{ d.cta_link.url }}" class="why-private__btn"{% if d.cta_link.target %} target="{{ d.cta_link.target }}"{% endif %}>{{ d.cta_link.title }}</a>{% endif %}
+    </div>
+    {% endif %}
+  </div>
+</section>

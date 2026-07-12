@@ -1,0 +1,30 @@
+{% extends "admin/change_list.html" %}
+
+{% block result_list %}
+  {% if earnings_summary %}
+  <div style="margin: 0 0 1.25rem; padding: 1rem 1.25rem; background: #ecfdf5; border: 1px solid #a7f3d0; border-radius: 8px;">
+    <div style="display: flex; flex-wrap: wrap; gap: 1rem; align-items: center; justify-content: space-between;">
+      <div>
+        <div style="font-size: 0.8rem; color: #047857; text-transform: uppercase;">Выручка за {{ earnings_summary.period_label }}</div>
+        <div style="font-size: 1.75rem; font-weight: 700; color: #065f46;">
+          {{ earnings_summary.total|floatformat:2 }} {{ earnings_summary.currency }}
+        </div>
+        <div style="font-size: 0.9rem; color: #047857; margin-top: 0.25rem;">
+          Подтверждённых броней: <strong>{{ earnings_summary.count }}</strong>
+          <span style="color: #6b7280;">(список ниже — <strong>все</strong> брони)</span>
+        </div>
+      </div>
+      <div style="display: flex; flex-wrap: wrap; gap: 0.35rem; font-size: 0.85rem; align-items: center;">
+        <span style="color: #6b7280;">Период итога:</span>
+        {% for link in earnings_summary.period_links %}
+        <a href="{{ link.url }}"
+           style="padding: 0.3rem 0.65rem; border-radius: 6px; text-decoration: none; border: 1px solid #a7f3d0; {% if earnings_summary.current_period == link.key %}background: #065f46; color: #fff;{% else %}color: #047857;{% endif %}">
+          {{ link.label }}
+        </a>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+  {% endif %}
+  {{ block.super }}
+{% endblock %}

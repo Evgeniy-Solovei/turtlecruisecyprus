@@ -1,0 +1,110 @@
+{% extends "admin/base_site.html" %}
+{% load i18n %}
+
+{% block extrahead %}
+{{ block.super }}
+<style>
+  .funnel-wrap { max-width: 1200px; }
+  .funnel-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; margin-bottom: 1.5rem; }
+  .funnel-card { background: var(--body-bg, #fff); border: 1px solid var(--border-color, #e5e7eb); border-radius: 8px; padding: 1rem 1.25rem; }
+  .funnel-card__label { font-size: 0.8rem; color: #6b7280; margin-bottom: 0.25rem; }
+  .funnel-card__value { font-size: 1.75rem; font-weight: 700; }
+  .funnel-filters { margin-bottom: 1.25rem; display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center; }
+  .funnel-filters a { padding: 0.35rem 0.75rem; border-radius: 6px; text-decoration: none; border: 1px solid #d1d5db; color: inherit; }
+  .funnel-filters a.is-active { background: #096d8e; color: #fff; border-color: #096d8e; }
+  .funnel-table { width: 100%; border-collapse: collapse; margin-bottom: 2rem; }
+  .funnel-table th, .funnel-table td { padding: 0.65rem 0.75rem; border-bottom: 1px solid #e5e7eb; text-align: left; }
+  .funnel-table th { font-size: 0.8rem; text-transform: uppercase; color: #6b7280; }
+  .funnel-note { background: #f0f9ff; border: 1px solid #bae6fd; border-radius: 8px; padding: 1rem; margin-bottom: 1.5rem; font-size: 0.95rem; line-height: 1.5; }
+  .funnel-section h2 { font-size: 1.1rem; margin: 1.5rem 0 0.75rem; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="funnel-wrap">
+  <h1>Статистика сайта</h1>
+
+  <div class="funnel-filters">
+    <span>Период:</span>
+    {% for d in day_options %}
+    <a href="?days={{ d }}" class="{% if d == days %}is-active{% endif %}">{{ d }} дн.</a>
+    {% endfor %}
+  </div>
+
+  <div class="funnel-note">
+    <strong>Как читать эту страницу</strong><br>
+    Здесь видно, сколько людей заходило на сайт и до какого шага доходили в форме бронирования (кнопка BOOK NOW).<br><br>
+    Если в таблице везде нули — люди смотрели сайт (галерея, главная), но <strong>никто не нажимал BOOK NOW</strong>. Это нормально, если за период не было попыток брони.<br><br>
+    Реальные оплаченные брони смотрите в разделе <strong>Брони</strong> со статусом «Подтверждена».
+  </div>
+
+  <div class="funnel-cards">
+    <div class="funnel-card">
+      <div class="funnel-card__label">Посетителей за {{ data.period_days }} дн.</div>
+      <div class="funnel-card__value">{{ data.sessions_total }}</div>
+    </div>
+    <div class="funnel-card">
+      <div class="funnel-card__label">Оплатили до конца</div>
+      <div class="funnel-card__value">{{ data.sessions_completed }}</div>
+    </div>
+    <div class="funnel-card">
+      <div class="funnel-card__label">Бросили на полпути</div>
+      <div class="funnel-card__value">{{ data.sessions_abandoned }}</div>
+    </div>
+    <div class="funnel-card">
+      <div class="funnel-card__label">Дошли до оплаты / открыли форму</div>
+      <div class="funnel-card__value">{{ data.booking_conversion_pct }}%</div>
+    </div>
+  </div>
+
+  <div class="funnel-section">
+    <h2>Форма бронирования — по шагам</h2>
+    <table class="funnel-table">
+      <thead>
+        <tr>
+          <th>Шаг</th>
+          <th>Человек</th>
+          <th>% от всех посетителей</th>
+          <th>% от прошлого шага</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in data.funnel %}
+        <tr>
+          <td>{{ row.label }}</td>
+          <td>{{ row.unique_sessions }}</td>
+          <td>{{ row.conversion_from_start_pct }}%</td>
+          <td>{% if row.conversion_from_prev_pct != None %}{{ row.conversion_from_prev_pct }}%{% else %}—{% endif %}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <div class="funnel-section">
+    <h2>Какие страницы смотрели</h2>
+    <table class="funnel-table">
+      <thead>
+        <tr>
+          <th>Страница</th>
+          <th>Просмотров</th>
+          <th>Среднее время, сек</th>
+          <th>Дочитали страницу, %</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in data.top_pages %}
+        <tr>
+          <td>{{ row.path }}</td>
+          <td>{{ row.views }}</td>
+          <td>{{ row.avg_duration_sec }}</td>
+          <td>{{ row.avg_scroll_pct }}</td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="4">Нет данных за выбранный период</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

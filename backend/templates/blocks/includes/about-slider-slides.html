@@ -1,0 +1,15 @@
+{% load cms_extras %}
+{% if d.slides %}
+<div class="about-slider__row">
+  <div class="about-slider__swiper swiper">
+    <div class="swiper-wrapper">
+      {% for slide in d.slides %}
+      <div class="swiper-slide">
+        {% if slide.image %}<div class="d-none d-md-block"><img src="{% media slide.image %}" alt="{{ slide.alt|default:'' }}"></div>{% endif %}
+        {% if slide.image_mob %}<div class="d-block d-md-none"><img src="{% media slide.image_mob %}" alt="{{ slide.alt|default:'' }}"></div>{% elif slide.image %}<div class="d-block d-md-none"><img src="{% media slide.image %}" alt="{{ slide.alt|default:'' }}"></div>{% endif %}
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+{% endif %}

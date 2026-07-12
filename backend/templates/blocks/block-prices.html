@@ -1,0 +1,29 @@
+{% load cms_extras %}
+<section class="prices"{% if d.block_id %} id="{{ d.block_id }}"{% endif %}>
+  <div class="container">
+    <div class="prices__inner">
+      {% if d.icon or d.title %}
+      <div class="prices__header">
+        {% if d.icon %}<div class="prices__icon"><img src="{% media d.icon %}" alt=""></div>{% endif %}
+        {% if d.title %}<h2 class="prices__title">{{ d.title }}</h2>{% endif %}
+      </div>
+      {% endif %}
+      {% if d.items %}
+      <div class="prices__list">
+        {% for item in d.items %}
+        {% if item.name %}
+        <div class="prices__item">
+          {% if item.icon %}<div class="prices__item-icon"><img src="{% media item.icon %}" alt=""></div>{% endif %}
+          <div class="prices__item-text">
+            <span class="prices__item-name">{{ item.name }}</span>
+            {% if item.price %}<span class="prices__item-price">{{ item.price }}</span>{% endif %}
+          </div>
+        </div>
+        {% endif %}
+        {% endfor %}
+      </div>
+      {% endif %}
+      {% if d.notes %}<div class="prices__notes">{{ d.notes|safe }}</div>{% endif %}
+    </div>
+  </div>
+</section>

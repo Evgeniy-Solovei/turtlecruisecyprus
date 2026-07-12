@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8"></head>
+<body style="margin:0;padding:0;background:#f5f5f5;font-family:Arial,sans-serif;">
+<table width="100%" cellpadding="0" cellspacing="0" style="background:#f5f5f5;padding:30px 0;">
+<tr><td align="center">
+<table width="560" cellpadding="0" cellspacing="0" style="background:#fff;border:1px solid #dcdcdc;border-radius:3px;">
+<tr>
+<td style="background:#096d8e;padding:24px 32px;border-radius:3px 3px 0 0;">
+<h2 style="color:#fff;margin:0;font-size:20px;font-weight:400;">New Booking #{{ booking_public_id }}</h2>
+</td>
+</tr>
+<tr>
+<td style="padding:28px 32px;">
+<p style="margin:0 0 16px;font-size:15px;color:#333;"><strong>New cruise booking received!</strong></p>
+<hr style="border:none;border-top:1px solid #e0e0e0;margin:16px 0;">
+<p style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#096d8e;margin:0 0 10px;">Booking</p>
+<table width="100%" cellpadding="0" cellspacing="0">
+<tr><td style="padding:6px 0;color:#888;font-size:13px;width:40%">Booking ID</td><td style="padding:6px 0;font-size:13px;font-weight:bold;">#{{ booking_public_id }}</td></tr>
+<tr><td style="padding:6px 0;color:#888;font-size:13px;">Cruise</td><td style="padding:6px 0;font-size:13px;font-weight:bold;">{{ cruise_name }}</td></tr>
+<tr><td style="padding:6px 0;color:#888;font-size:13px;">Date</td><td style="padding:6px 0;font-size:13px;font-weight:bold;">{{ date_formatted }}</td></tr>
+<tr><td style="padding:6px 0;color:#888;font-size:13px;">Time</td><td style="padding:6px 0;font-size:13px;font-weight:bold;">{{ cruise_time }}</td></tr>
+<tr><td style="padding:6px 0;color:#888;font-size:13px;">Adults (10+)</td><td style="padding:6px 0;font-size:13px;font-weight:bold;">{{ adults_count }} × €{{ booking.adult_unit_price }} = €{{ adult_total }}</td></tr>
+<tr><td style="padding:6px 0;color:#888;font-size:13px;">Children</td><td style="padding:6px 0;font-size:13px;font-weight:bold;">{% if children_count %}{{ children_count }} × €{{ booking.child_unit_price }} = €{{ child_total }}{% else %}0{% endif %}</td></tr>
+<tr><td style="padding:6px 0;color:#888;font-size:13px;">Total</td><td style="padding:6px 0;font-size:16px;font-weight:bold;color:#096d8e;">€{{ total_amount }}</td></tr>
+</table>
+<hr style="border:none;border-top:1px solid #e0e0e0;margin:16px 0;">
+<p style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#096d8e;margin:0 0 10px;">Customer</p>
+<table width="100%" cellpadding="0" cellspacing="0">
+<tr><td style="padding:6px 0;color:#888;font-size:13px;width:40%">Name</td><td style="padding:6px 0;font-size:13px;font-weight:bold;">{{ customer_name }}</td></tr>
+<tr><td style="padding:6px 0;color:#888;font-size:13px;">Email</td><td style="padding:6px 0;font-size:13px;"><a href="mailto:{{ booking.customer.email }}" style="color:#096d8e;">{{ booking.customer.email }}</a></td></tr>
+<tr><td style="padding:6px 0;color:#888;font-size:13px;">Phone</td><td style="padding:6px 0;font-size:13px;"><a href="tel:{{ booking.customer.phone }}" style="color:#096d8e;">{{ booking.customer.phone }}</a></td></tr>
+{% if booking.customer_notes %}
+<tr><td style="padding:6px 0;color:#888;font-size:13px;">Notes</td><td style="padding:6px 0;font-size:13px;">{{ booking.customer_notes }}</td></tr>
+{% endif %}
+{% if payment_id %}
+<tr><td style="padding:6px 0;color:#888;font-size:13px;">Stripe ID</td><td style="padding:6px 0;font-size:11px;color:#888;">{{ payment_id }}</td></tr>
+{% endif %}
+</table>
+</td>
+</tr>
+<tr>
+<td style="background:#096d8e;padding:14px 32px;text-align:center;border-radius:0 0 3px 3px;">
+<p style="margin:0;font-size:12px;color:#c8e8f0;">Turtle Cruise Cyprus — Admin Notification</p>
+</td>
+</tr>
+</table>
+</td></tr>
+</table>
+</body>
+</html>

@@ -1,0 +1,46 @@
+{% load cms_extras %}
+<section class="section reviews"{% if d.block_id %} id="{{ d.block_id }}"{% endif %}>
+  <div class="container">
+    <div class="reviews__header">
+      {% if d.title %}<h1 class="reviews__title">{{ d.title|safe }}</h1>{% endif %}
+      {% if d.rating %}<p class="reviews__rating">{{ d.rating|safe }}</p>{% endif %}
+    </div>
+    {% if d.items %}
+    <div class="reviews__grid" data-per-col-load="3">
+      <div class="col" id="reviews-col-1">
+        {% for item in d.items|reviews_column:1 %}
+        <div class="reviews__card-wrap{% if forloop.counter > 6 %} reviews__card-wrap--hidden{% endif %}">
+          <div class="reviews__card">
+            <div class="reviews__stars">★★★★★</div>
+            {% if item.quote %}<blockquote class="reviews__quote">"{{ item.quote }}"</blockquote>{% endif %}
+            <div class="reviews__author">
+              {% if item.name %}<span class="reviews__name">{{ item.name }}</span>{% endif %}
+              {% if item.location %}<span class="reviews__location">{{ item.location }}</span>{% endif %}
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+      <div class="col" id="reviews-col-2">
+        {% for item in d.items|reviews_column:2 %}
+        <div class="reviews__card-wrap{% if forloop.counter > 6 %} reviews__card-wrap--hidden{% endif %}">
+          <div class="reviews__card">
+            <div class="reviews__stars">★★★★★</div>
+            {% if item.quote %}<blockquote class="reviews__quote">"{{ item.quote }}"</blockquote>{% endif %}
+            <div class="reviews__author">
+              {% if item.name %}<span class="reviews__name">{{ item.name }}</span>{% endif %}
+              {% if item.location %}<span class="reviews__location">{{ item.location }}</span>{% endif %}
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    {% if d.items|length > 12 %}
+    <div class="reviews__load-more">
+      <button class="reviews__load-btn" id="reviewsLoadMore" type="button">LOAD MORE REVIEWS</button>
+    </div>
+    {% endif %}
+    {% endif %}
+  </div>
+</section>

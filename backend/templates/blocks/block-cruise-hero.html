@@ -1,0 +1,46 @@
+{% load cms_extras static %}
+<section class="section cruise-hero"{% if d.block_id %} id="{{ d.block_id }}"{% endif %}>
+  <div class="container">
+    <div class="cruise-hero__header">
+      {% if d.title %}<h1>{{ d.title|safe }}</h1>{% endif %}
+      {% if d.subtitle or d.subtitle_strong %}
+      <p class="cruise-hero__sub">
+        {% if d.subtitle %}{{ d.subtitle|safe }}{% endif %}
+        {% if d.subtitle and d.subtitle_strong %}<br>{% endif %}
+        {% if d.subtitle_strong %}<strong>{{ d.subtitle_strong }}</strong>{% endif %}
+      </p>
+      {% endif %}
+    </div>
+  </div>
+  <div class="cruise-hero__visual">
+    {% if d.visual_type == "slider" and d.slider_images %}
+    <div class="swiper hero__visual-swiper">
+      <div class="swiper-wrapper">
+        {% for img_id in d.slider_images %}
+        <div class="swiper-slide">{% if img_id %}<img src="{% media img_id %}" alt="">{% endif %}</div>
+        {% endfor %}
+      </div>
+    </div>
+    {% else %}
+    <div class="bg-block">
+      {% if d.bg_image %}<img src="{% media d.bg_image %}" class="d-none d-md-block" alt="">{% endif %}
+      {% if d.bg_image_mob %}<img src="{% media d.bg_image_mob %}" class="d-block d-md-none" alt="">{% elif d.bg_image %}<img src="{% media d.bg_image %}" class="d-block d-md-none" alt="">{% endif %}
+    </div>
+    {% endif %}
+    {% if d.card_price %}
+      {% if d.cruise_open2 and d.cruise_open2 != "— Use URL —" %}
+      <button type="button" class="cruise-hero__tour-card" data-cruise-open="{{ d.cruise_open2 }}">
+      {% else %}
+      <a href="{{ d.card_link|default:'#' }}" class="cruise-hero__tour-card">
+      {% endif %}
+        {% if d.card_image %}<div class="cruise-hero__tour-img"><img src="{% media d.card_image %}" alt=""></div>{% elif d.bg_image %}<div class="cruise-hero__tour-img"><img src="{% media d.bg_image %}" alt=""></div>{% endif %}
+        <div class="cruise-hero__tour-info">
+          {% if d.card_title %}<h3>{{ d.card_title|safe }}</h3>{% endif %}
+          {% if d.card_time %}<div class="cruise-hero__tour-time"><span>{{ d.card_time }}</span></div>{% endif %}
+          {% if d.card_desc %}<p>{{ d.card_desc }}</p>{% endif %}
+        </div>
+        <div class="cruise-hero__tour-price"><div class="price"><span>€</span>{{ d.card_price }}</div></div>
+      {% if d.cruise_open2 and d.cruise_open2 != "— Use URL —" %}</button>{% else %}</a>{% endif %}
+    {% endif %}
+  </div>
+</section>

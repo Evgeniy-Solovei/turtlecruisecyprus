@@ -1,0 +1,28 @@
+{% load cms_extras %}
+<div class="cruise-info"{% if d.block_id %} id="{{ d.block_id }}"{% endif %}>
+  <div class="container">
+    <div class="cruise-info__inner">
+      {% if d.stats %}
+      <div class="cruise-info__stats">
+        {% for stat in d.stats %}
+        {% if stat.value %}
+        <div class="cruise-info__item">
+          {% if stat.icon %}<div class="cruise-info__icon"><img src="{% media stat.icon %}" alt=""></div>{% endif %}
+          <div class="cruise-info__text">
+            <span class="cruise-info__value">{{ stat.value }}</span>
+            {% if stat.label %}<span class="cruise-info__label">{{ stat.label }}</span>{% endif %}
+          </div>
+        </div>
+        {% endif %}
+        {% endfor %}
+      </div>
+      {% endif %}
+      {% if d.btn_filled_text or d.btn_outline_text %}
+      <div class="cruise-info__actions">
+        {% if d.btn_filled_text %}<a href="{{ d.btn_filled_url|default:'#' }}" class="cruise-info__btn cruise-info__btn--filled" data-fancybox data-type="iframe">{{ d.btn_filled_text }}</a>{% endif %}
+        {% if d.btn_outline_text %}<a href="{{ d.btn_outline_url|default:'#' }}" class="cruise-info__btn cruise-info__btn--outline" data-fancybox>{{ d.btn_outline_text }}</a>{% endif %}
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</div>

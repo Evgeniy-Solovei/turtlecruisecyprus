@@ -1,0 +1,36 @@
+{% load cms_extras %}
+<section class="section review-slider"{% if d.block_id %} id="{{ d.block_id }}"{% endif %}>
+  <div class="container">
+    {% if d.title or d.rating_text %}
+    <div class="review-slider__header">
+      {% if d.title %}<div class="col"><h2 class="review-slider__title">{{ d.title|safe }}</h2></div>{% endif %}
+      {% if d.rating_text %}<div class="col"><p class="review-slider__rating">{{ d.rating_text|safe }}</p></div>{% endif %}
+    </div>
+    {% endif %}
+    {% if d.items %}
+    <div class="review-slider__wrap">
+      <div class="review-slider__swiper swiper">
+        <div class="swiper-wrapper">
+          {% for item in d.items %}
+          <div class="swiper-slide">
+            <div class="reviews__card">
+              <div class="reviews__stars">★★★★★</div>
+              {% if item.quote %}<blockquote class="reviews__quote">"{{ item.quote }}"</blockquote>{% endif %}
+              <div class="reviews__author">
+                {% if item.name %}<span class="reviews__name">{{ item.name }}</span>{% endif %}
+                {% if item.location %}<span class="reviews__location">{{ item.location }}</span>{% endif %}
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+    {% endif %}
+    {% if d.footer_link %}
+    <div class="review-slider__footer">
+      <a href="{{ d.footer_link.url }}" class="review-slider__btn"{% if d.footer_link.target %} target="{{ d.footer_link.target }}"{% endif %}>{{ d.footer_link.title }}</a>
+    </div>
+    {% endif %}
+  </div>
+</section>

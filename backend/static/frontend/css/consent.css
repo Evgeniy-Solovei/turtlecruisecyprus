@@ -1,0 +1,39 @@
+.tc-consent {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 10000;
+  background: rgba(9, 109, 142, 0.96);
+  color: #fff;
+  padding: 1rem;
+}
+.tc-consent__inner {
+  max-width: 960px;
+  margin: 0 auto;
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+.tc-consent__actions {
+  display: flex;
+  gap: 0.75rem;
+}
+.tc-consent__btn {
+  border: 0;
+  border-radius: 999px;
+  padding: 0.6rem 1.2rem;
+  cursor: pointer;
+  font-weight: 600;
+}
+.tc-consent__btn--primary {
+  background: #fff;
+  color: #096d8e;
+}
+.tc-consent__btn--secondary {
+  background: transparent;
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.7);
+}

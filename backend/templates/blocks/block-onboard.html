@@ -1,0 +1,36 @@
+{% load cms_extras %}
+<section class="section onboard"{% if d.block_id %} id="{{ d.block_id }}"{% endif %}>
+  <div class="container">
+    <div class="onboard__inner">
+      <div class="onboard__left">
+        <div class="top">
+          {% if d.title %}<h2 class="onboard__title">{{ d.title|safe }}</h2>{% endif %}
+          {% if d.desc %}<p class="onboard__desc">{{ d.desc }}</p>{% endif %}
+        </div>
+      </div>
+      {% if d.slides %}
+      <div class="onboard__swiper swiper">
+        <div class="swiper-wrapper">
+          {% for slide in d.slides %}
+          <div class="swiper-slide">
+            <div class="onboard__card">
+              <div class="bg-block">
+                {% if slide.image %}<img src="{% media slide.image %}" alt="">{% endif %}
+                <div class="onboard__gradient"></div>
+              </div>
+              {% if slide.video_url %}
+              <a href="{{ slide.video_url }}" data-fancybox data-type="iframe" class="onboard__play">▶</a>
+              {% endif %}
+              <div class="onboard__card-body">
+                {% if slide.title %}<h3>{{ slide.title }}</h3>{% endif %}
+                {% if slide.text %}<p>{{ slide.text }}</p>{% endif %}
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</section>

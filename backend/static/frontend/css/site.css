@@ -1,0 +1,75 @@
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, sans-serif;
+  color: #010c29;
+  background: #f3f4fb;
+}
+
+.site-header {
+  background: #001d47;
+  color: #fff;
+}
+
+.site-header__inner {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 1rem 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.site-logo {
+  color: #fff;
+  text-decoration: none;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+}
+
+.site-btn {
+  border: none;
+  border-radius: 2rem;
+  background: #fbe305;
+  color: #001d47;
+  padding: 0.75rem 1.5rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.site-btn--large {
+  padding: 1rem 2rem;
+}
+
+.site-btn--secondary {
+  background: #fff;
+}
+
+.hero {
+  min-height: calc(100vh - 72px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+}
+
+.hero__inner {
+  max-width: 720px;
+  text-align: center;
+}
+
+.hero h1 {
+  color: #001d47;
+  margin-bottom: 1rem;
+}
+
+.hero__actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-top: 2rem;
+}
+
+.hero--thankyou p {
+  color: #808184;
+}

@@ -1,0 +1,63 @@
+{% load cms_extras %}
+<section class="section guest-photos"{% if d.block_id %} id="{{ d.block_id }}"{% endif %}>
+  <div class="container">
+    <div class="guest-photos__header">
+      {% if d.title %}<div class="col"><h2 class="guest-photos__title">{{ d.title|safe }}</h2></div>{% endif %}
+      {% if d.instagram_url and d.instagram_handle %}
+      <div class="col">
+        <p class="guest-photos__sub">Follow us on <a href="{{ d.instagram_url }}" target="_blank" rel="noopener noreferrer">{{ d.instagram_handle }}</a></p>
+      </div>
+      {% endif %}
+    </div>
+    {% if d.items %}
+    <div class="gallery__masonry d-none d-md-flex">
+      {% guest_photo_columns d.items as photo_columns %}
+      {% for offset, col_items in photo_columns %}
+      <div class="gallery__col{% if offset %} gallery__col--offset{% endif %}">
+        {% for item in col_items %}
+        <div class="gallery__item{% if item.size %} gallery__item--{{ item.size }}{% endif %}">
+          {% if item.image %}<img src="{% media item.image %}" alt="">{% endif %}
+        </div>
+        {% endfor %}
+      </div>
+      {% endfor %}
+    </div>
+    <div class="d-block d-md-none">
+      <div class="swiper gallery-swiper">
+        <div class="swiper-wrapper">
+          {% for item in d.items %}
+          {% if forloop.counter <= 6 %}
+          <div class="swiper-slide">
+            <div class="gallery__item">{% if item.image %}<img src="{% media item.image %}" alt="">{% endif %}</div>
+          </div>
+          {% endif %}
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+    {% endif %}
+    <div class="flex-control">
+      <button class="gallery__arrow gallery-prev" type="button" aria-label="Previous">
+        <svg viewBox="0 0 49 49" fill="none" aria-hidden="true">
+          <rect x="49" y="49" width="49" height="49" rx="24.5" transform="rotate(-180 49 49)" fill="#096D8E"/>
+          <path d="M22.1349 37.7995L11.1785 25.4841C11.1219 25.4205 11.077 25.3451 11.0464 25.262C11.0158 25.1789 11 25.0899 11 25C11 24.9101 11.0158 24.8211 11.0464 24.738C11.077 24.6549 11.1219 24.5795 11.1785 24.5159L22.1349 12.2005C22.2491 12.0721 22.404 12 22.5655 12C22.727 12 22.8819 12.0721 22.9961 12.2005C23.1104 12.3289 23.1745 12.503 23.1745 12.6846C23.1745 12.8661 23.1104 13.0403 22.9961 13.1686L13.0791 24.3158L38.3913 24.3158C38.5527 24.3158 38.7076 24.3879 38.8217 24.5162C38.9359 24.6445 39 24.8185 39 25C39 25.1815 38.9359 25.3555 38.8217 25.4838C38.7076 25.6121 38.5527 25.6842 38.3913 25.6842L13.0791 25.6842L22.9961 36.8314C23.1104 36.9597 23.1745 37.1339 23.1745 37.3154C23.1745 37.497 23.1104 37.6711 22.9961 37.7995C22.8819 37.9279 22.727 38 22.5655 38C22.404 38 22.2491 37.9279 22.1349 37.7995Z" fill="white"/>
+        </svg>
+      </button>
+      <div class="gallery-pagination swiper-pagination"></div>
+      <button class="gallery__arrow gallery-next" type="button" aria-label="Next">
+        <svg viewBox="0 0 49 49" fill="none" aria-hidden="true">
+          <rect width="49" height="49" rx="24.5" fill="#096D8E"/>
+          <path d="M26.8651 11.2005L37.8215 23.5159C37.8781 23.5795 37.923 23.6549 37.9536 23.738C37.9842 23.8211 38 23.9101 38 24C38 24.0899 37.9842 24.1789 37.9536 24.262C37.923 24.3451 37.8781 24.4205 37.8215 24.4841L26.8651 36.7995C26.7509 36.9279 26.596 37 26.4345 37C26.273 37 26.1181 36.9279 26.0039 36.7995C25.8896 36.6711 25.8255 36.497 25.8255 36.3154C25.8255 36.1339 25.8896 35.9597 26.0039 35.8314L35.9209 24.6842L10.6087 24.6842C10.4473 24.6842 10.2924 24.6121 10.1783 24.4838C10.0641 24.3555 10 24.1815 10 24C10 23.8185 10.0641 23.6445 10.1783 23.5162C10.2924 23.3879 10.4473 23.3158 10.6087 23.3158L35.9209 23.3158L26.0039 12.1686C25.8896 12.0403 25.8255 11.8661 25.8255 11.6846C25.8255 11.503 25.8896 11.3289 26.0039 11.2005C26.1181 11.0721 26.273 11 26.4345 11C26.596 11 26.7509 11.0721 26.8651 11.2005Z" fill="white"/>
+        </svg>
+      </button>
+    </div>
+    {% if d.btn_url %}
+    <div class="guest-photos__footer">
+      <a href="{{ d.btn_url }}" class="guest-photos__btn">
+        <span class="d-none d-md-block">{{ d.btn_label_desktop|default:"LOAD MORE GUEST PHOTOS" }}</span>
+        <span class="d-block d-md-none">{{ d.btn_label_mobile|default:"MORE photos" }}</span>
+      </a>
+    </div>
+    {% endif %}
+  </div>
+</section>

@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}{{ page_title }} — Turtle Cruise Cyprus{% endblock %}
+{% block content %}
+<section class="section legal-page">
+  <div class="container">
+    <div class="content legal-page__content">
+      {% if page_html %}
+      {{ page_html|safe }}
+      {% else %}
+      <h1>{{ page_title }}</h1>
+      <p>{{ page_title }}</p>
+      {% endif %}
+    </div>
+  </div>
+</section>
+{% include "pages/wp/partials/book_block.html" %}
+{% endblock %}

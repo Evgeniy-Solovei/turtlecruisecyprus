@@ -1,0 +1,10 @@
+{% load cms_extras %}
+<section class="cruise-intro"{% if d.block_id %} id="{{ d.block_id }}"{% endif %}>
+  <div class="container">
+    <div class="cruise-intro__inner">
+      {% if d.icon %}<div class="cruise-intro__icon"><img src="{% media d.icon %}" alt=""></div>{% endif %}
+      {% if d.title %}<h2 class="cruise-intro__title">{{ d.title }}</h2>{% endif %}
+      {% if d.text %}<p class="cruise-intro__text">{{ d.text }}</p>{% endif %}
+    </div>
+  </div>
+</section>

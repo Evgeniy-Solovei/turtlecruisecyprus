@@ -1,0 +1,49 @@
+{% load cms_extras static %}
+<section class="section route" id="{{ d.block_id|default:'route' }}">
+  {% if d.title %}
+  <div class="container"><h2 class="route__title">{{ d.title|safe }}</h2></div>
+  {% endif %}
+  {% if d.locations %}
+  <div class="route__photos">
+    <div class="route__gradient"></div>
+    {% for loc in d.locations %}
+    <div class="route__photo{% if forloop.first %} active{% endif %}" data-index="{{ forloop.counter }}">
+      {% if loc.image %}<img src="{% media loc.image %}" class="d-none d-md-block" alt="">{% endif %}
+      {% if loc.image_mob %}<img src="{% media loc.image_mob %}" class="d-block d-md-none" alt="">{% elif loc.image %}<img src="{% media loc.image %}" class="d-block d-md-none" alt="">{% endif %}
+    </div>
+    {% endfor %}
+  </div>
+  <div class="route__map">
+    <div class="route__line">
+      <div class="route__dots route__dots--top">
+        {% for loc in d.locations %}
+        <div class="route__dot{% if forloop.first %} active{% endif %}" data-index="{{ forloop.counter }}">
+          <img class="svg-image" src="{% static 'frontend/img/dist/location-icon.svg' %}" alt="">
+          <span>{{ loc.label }}</span>
+        </div>
+        {% endfor %}
+      </div>
+      <div class="route__line-track">
+        {% for loc in d.locations %}
+        <span class="route__circle{% if forloop.first %} active{% endif %}" data-index="{{ forloop.counter }}"></span>
+        {% endfor %}
+      </div>
+      <div class="route__dots route__dots--bottom">
+        {% for loc in d.locations %}
+        {% if forloop.counter|divisibleby:2 %}
+        <div class="route__dot" data-index="{{ forloop.counter }}">
+          <img class="svg-image" src="{% static 'frontend/img/dist/location-icon.svg' %}" alt="">
+          <span>{{ loc.label }}</span>
+        </div>
+        {% endif %}
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+  {% endif %}
+  {% if d.footer_link %}
+  <div class="route__footer">
+    <a href="{{ d.footer_link.url }}" class="route__btn"{% if d.footer_link.target %} target="{{ d.footer_link.target }}"{% endif %} data-fancybox>{{ d.footer_link.title }}</a>
+  </div>
+  {% endif %}
+</section>

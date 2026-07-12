@@ -1,0 +1,38 @@
+{% load cms_extras %}
+<section class="section about"{% if d.block_id %} id="{{ d.block_id }}"{% endif %}>
+  <div class="container">
+    <div class="about__header">
+      {% if d.stats %}
+      <div class="about__stats">
+        {% for stat in d.stats %}
+        <div class="about__stat">
+          <span class="about__stat-num">{{ stat.number }}</span>
+          <span class="about__stat-label">{{ stat.label }}</span>
+        </div>
+        {% endfor %}
+      </div>
+      {% endif %}
+      {% if d.find_title or d.find_btns %}
+      <div class="about__find">
+        {% if d.find_title %}<h2>{{ d.find_title|default:"Find us" }}</h2>{% endif %}
+        {% if d.find_btns %}
+        <div class="about__btns">
+          {% for btn in d.find_btns %}
+          <div><a href="{{ btn.url|default:'#' }}" class="about__btn" target="_blank" rel="noopener noreferrer"><span>{{ btn.label }}</span></a></div>
+          {% endfor %}
+        </div>
+        {% endif %}
+      </div>
+      {% endif %}
+      <div class="about__contact">
+        {% if d.contact_title %}<h2>{{ d.contact_title|default:"Get in touch" }}</h2>{% endif %}
+        {% if d.contact_desc %}<p class="about__contact-desc">{{ d.contact_desc }}</p>{% endif %}
+        <div class="about__btns">
+          {% if d.whatsapp %}<div><a href="{{ d.whatsapp }}" class="about__btn" target="_blank" rel="noopener noreferrer"><span>WHATSAPP</span></a></div>{% endif %}
+          {% if d.email %}<div><a href="mailto:{{ d.email }}" class="about__btn about__btn--wide"><span class="d-none d-md-block">{{ d.email|upper }}</span><span class="d-block d-md-none">{{ d.email|cut:"@"|upper }}@</span></a></div>{% endif %}
+          {% if d.phone %}<div><a href="tel:{{ d.phone|phone_digits }}" class="about__btn"><span>{{ d.phone }}</span></a></div>{% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

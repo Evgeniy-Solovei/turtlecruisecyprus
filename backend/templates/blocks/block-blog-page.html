@@ -1,0 +1,12 @@
+{% load cms_extras %}
+<section class="section blog blog-page"{% if d.block_id %} id="{{ d.block_id }}"{% endif %}>
+  <div class="container">
+    {% if d.title or d.subtitle %}
+    <div class="blog__header">
+      {% if d.title %}<h1>{{ d.title }}</h1>{% endif %}
+      {% if d.subtitle %}<p class="blog__subtitle">{{ d.subtitle }}</p>{% endif %}
+    </div>
+    {% endif %}
+    {% blog_page_posts d.posts_per_page|default:9 d.load_more_label|default:"Load MORE" %}
+  </div>
+</section>

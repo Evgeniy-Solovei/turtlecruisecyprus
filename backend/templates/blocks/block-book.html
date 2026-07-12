@@ -1,0 +1,16 @@
+{% load cms_extras %}
+<section class="section book"{% if d.block_id %} id="{{ d.block_id }}"{% endif %}>
+  <div class="bg-block">
+    {% if d.image %}<img src="{% media d.image %}" class="d-none d-md-block" alt="">{% endif %}
+    {% if d.image_mob %}<img src="{% media d.image_mob %}" class="d-block d-md-none" alt="">{% elif d.image %}<img src="{% media d.image %}" class="d-block d-md-none" alt="">{% endif %}
+    <div class="book__gradient"></div>
+  </div>
+  <div class="container">
+    <div class="book__inner">
+      {% if d.title %}<h2 class="book__title">{{ d.title }}</h2>{% endif %}
+      {% if d.subtitle %}<p class="book__subtitle">{{ d.subtitle }}</p>{% endif %}
+      {% if d.link %}<button class="book__btn" type="button" data-cruise-open>{{ d.link.title }}</button>{% endif %}
+      {% if d.note %}<p class="book__note">{{ d.note|linebreaksbr }}</p>{% endif %}
+    </div>
+  </div>
+</section>

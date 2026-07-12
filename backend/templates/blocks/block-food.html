@@ -1,0 +1,33 @@
+{% load cms_extras %}
+<section class="food"{% if d.block_id %} id="{{ d.block_id }}"{% endif %}>
+  <div class="container">
+    <div class="food__inner">
+      {% if d.icon %}<div class="food__icon"><img src="{% media d.icon %}" alt=""></div>{% endif %}
+      {% if d.desc %}<p class="food__desc">{{ d.desc }}</p>{% endif %}
+      {% if d.gallery %}
+      <div class="food__gallery">
+        {% for item in d.gallery %}
+        {% if item.image %}
+        <div class="food__gallery-item food__gallery-item--{{ item.size|default:'tall' }}">
+          <img src="{% media item.image %}" alt="Food on board">
+        </div>
+        {% endif %}
+        {% endfor %}
+      </div>
+      {% endif %}
+      {% if d.badges %}
+      <div class="food__badges">
+        {% for badge in d.badges %}
+        {% if badge.text %}
+        <div class="food__badge">
+          {% if badge.icon %}<img src="{% media badge.icon %}" alt="">{% endif %}
+          <span>{{ badge.text }}</span>
+        </div>
+        {% endif %}
+        {% endfor %}
+      </div>
+      {% endif %}
+      {% if d.button_text %}<a href="{{ d.button_url|default:'#' }}" class="food__btn" data-fancybox data-type="iframe">{{ d.button_text }}</a>{% endif %}
+    </div>
+  </div>
+</section>

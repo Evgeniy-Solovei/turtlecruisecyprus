@@ -1,0 +1,37 @@
+{% load cms_extras %}
+<section class="section benefits"{% if d.block_id %} id="{{ d.block_id }}"{% endif %}>
+  <div class="bg-block"></div>
+  <div class="container">
+    {% if d.title or d.subtitle %}
+    <div class="benefits__header">
+      {% if d.title %}<h2>{{ d.title|safe }}</h2>{% endif %}
+      {% if d.subtitle %}<p>{{ d.subtitle }}</p>{% endif %}
+    </div>
+    {% endif %}
+    {% if d.items %}
+    <div class="benefits__grid">
+      {% for item in d.items %}
+      <div class="benefits__card">
+        {% if item.image %}<div class="benefits__card-img"><img src="{% media item.image %}" alt=""></div>{% endif %}
+        {% if item.title %}<h3 class="benefits__card-title">{{ item.title|safe }}</h3>{% endif %}
+        {% if item.lead or item.text %}
+        <div class="benefits__card-body">
+          {% if item.lead %}<p class="benefits__card-lead">{{ item.lead }}</p>{% endif %}
+          {% if item.text %}<p>{{ item.text }}</p>{% endif %}
+        </div>
+        {% endif %}
+        {% if item.link or item.video_url %}
+        <div class="flex-btn">
+          {% if item.video_url %}
+          <a href="{{ item.video_url }}" class="benefits__card-btn" data-fancybox data-type="iframe">{{ item.link.title|default:"Watch Video" }}</a>
+          {% elif item.link %}
+          <a href="{{ item.link.url }}" class="benefits__card-btn"{% if item.link.target %} target="{{ item.link.target }}"{% endif %}>{{ item.link.title }}</a>
+          {% endif %}
+        </div>
+        {% endif %}
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+  </div>
+</section>
