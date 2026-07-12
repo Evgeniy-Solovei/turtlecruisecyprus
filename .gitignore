@@ -1,0 +1,66 @@
+# OS
+.DS_Store
+Thumbs.db
+
+# Secrets — NEVER commit
+.env
+.env.*
+!.env.example
+backend/.env
+backend/.env.*
+!.backend/.env.example
+.turtlecruise_secrets.local.env
+*.local.env
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.Python
+*.egg-info/
+.eggs/
+dist/
+build/
+.pytest_cache/
+.coverage
+htmlcov/
+.mypy_cache/
+.ruff_cache/
+
+# Virtualenv
+.venv/
+venv/
+backend/.venv/
+
+# Django local DB and collected static
+backend/db.sqlite3
+backend/*.sqlite3
+backend/staticfiles/
+
+# User uploads (copy via rsync to server, not git)
+backend/media/
+!backend/media/.gitkeep
+
+# WordPress dump (large, contains customer data)
+turtlecruisebyscubacat/
+installer.php
+
+# IDE / Cursor (local index cache — never commit)
+.idea/
+.vscode/
+.cursor/
+.cursorj/
+**/.cursorj/
+*.swp
+*.swo
+
+# Logs
+*.log
+logs/
+
+# Docker volumes (local)
+pgdata/
+
+# Internal audit / planning notes (may reference secrets)
+admin_hidden_settings_audit.md
+django_migration_plan.md
