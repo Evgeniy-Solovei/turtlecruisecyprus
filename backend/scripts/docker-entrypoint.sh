@@ -50,7 +50,7 @@ PY
   gosu appuser python manage.py collectstatic --noinput
 
   echo "==> Ensuring site assets (footer icons, media check)..."
-  gosu appuser python manage.py ensure_site_assets
+  gosu appuser python manage.py ensure_site_assets || echo "WARN: ensure_site_assets failed (non-fatal)"
 else
   echo "==> Skipping migrations/collectstatic (RUN_MIGRATIONS!=1)"
 fi
