@@ -1,5 +1,7 @@
 from django.core.management.base import BaseCommand
 
+MIN_IMPORTED_BODY = 2000
+
 
 class Command(BaseCommand):
     help = "Deploy hook: fix footer asset URLs and verify media folder."
@@ -25,6 +27,25 @@ class Command(BaseCommand):
             from pathlib import Path
 
             from django.conf import settings
+
+            from apps.cms.models import SitePage
+
+            home = SitePage.objects.filter(slug="", locale="en").first()
+            home_len = len((home.body_html or "") if home else "")
+            self.stdout.write(f"Home CMS body: {home_len} chars")
+            if home_len < MIN_IMPORTED_BODY:
+                dump = Path("/tmp/dump.sql")
+                if dump.is_file():
+                    self.stdout.write("Running import_wp_site (home content missing)...")
+                    from django.core.management import call_command
+
+                    call_command("import_wp_site", sql=str(dump))
+                else:
+                    self.stdout.write(
+                        self.style.WARNING(
+                            "Home uses git template — copy dump to /tmp/dump.sql to auto-import."
+                        )
+                    )
 
             media_wp = Path(settings.MEDIA_ROOT) / "wp"
             if media_wp.is_dir():
