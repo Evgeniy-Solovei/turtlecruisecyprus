@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from urllib.parse import urlencode
+
 from django.http import Http404, HttpResponsePermanentRedirect
 from django.shortcuts import redirect, render
 from django.utils.decorators import method_decorator
@@ -209,11 +211,15 @@ def booking_return_redirect(request):
     locale = getattr(request, "locale", DEFAULT_LOCALE)
     public_id = request.GET.get("tc_booking_return") or ""
     session_id = request.GET.get("session_id") or ""
-    if session_id:
-        request.session["tc_checkout_session_id"] = session_id
+    thank_you = localized_path(locale, "/thank-you/")
+    query: dict[str, str] = {}
     if public_id:
-        request.session["tc_pending_booking_id"] = public_id
-    return redirect(localized_path(locale, "/thank-you/"))
+        query["booking_id"] = public_id
+    if session_id:
+        query["session_id"] = session_id
+    if query:
+        thank_you = f"{thank_you}?{urlencode(query)}"
+    return redirect(thank_you)
 
 
 def page_not_found(request, exception):

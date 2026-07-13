@@ -11,6 +11,7 @@ from rest_framework.response import Response
 
 from apps.bookings.models import Booking
 
+from .models import Payment
 from .services import checkout_deadline_for_payment, create_or_get_payment_intent, verify_checkout_session_and_confirm, verify_payment_intent_and_confirm
 from .stripe_client import StripeNotConfigured
 from .webhooks import handle_stripe_webhook
@@ -63,11 +64,49 @@ def stripe_payment_intent(request):
 
 @api_view(["POST"])
 def stripe_confirm(request):
-    booking = get_object_or_404(Booking, public_id=request.data["booking_id"])
-    if request.data.get("checkout_session_id"):
-        payment = verify_checkout_session_and_confirm(booking, request.data["checkout_session_id"])
-    else:
-        payment = verify_payment_intent_and_confirm(booking, request.data["payment_intent_id"])
+    booking_id = request.data.get("booking_id")
+    if not booking_id:
+        return Response({"detail": "booking_id is required."}, status=status.HTTP_400_BAD_REQUEST)
+    booking = get_object_or_404(Booking, public_id=booking_id)
+
+    if booking.status == Booking.Status.CONFIRMED:
+        payment = (
+            Payment.objects.filter(booking=booking, status=Payment.Status.SUCCEEDED)
+            .order_by("-id")
+            .first()
+        )
+        if payment:
+            return Response(
+                {
+                    "payment_id": payment.id,
+                    "status": payment.status,
+                    "booking_status": booking.status,
+                }
+            )
+
+    session_id = (request.data.get("checkout_session_id") or "").strip()
+    payment_intent_id = (request.data.get("payment_intent_id") or "").strip()
+    try:
+        if session_id:
+            payment = verify_checkout_session_and_confirm(booking, session_id)
+        elif payment_intent_id:
+            payment = verify_payment_intent_and_confirm(booking, payment_intent_id)
+        else:
+            return Response(
+                {"detail": "checkout_session_id or payment_intent_id is required."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+    except ValueError as exc:
+        return Response({"detail": str(exc)}, status=status.HTTP_400_BAD_REQUEST)
+    except Payment.DoesNotExist:
+        return Response({"detail": "Payment record not found for this booking."}, status=status.HTTP_404_NOT_FOUND)
+    except Exception as exc:
+        stripe_response = _stripe_error_response(exc)
+        if stripe_response is not None:
+            return stripe_response
+        logger.exception("stripe_confirm failed booking=%s", booking.public_id)
+        return Response({"detail": "Payment confirmation failed."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
     booking.refresh_from_db()
     return Response({"payment_id": payment.id, "status": payment.status, "booking_status": booking.status})
 

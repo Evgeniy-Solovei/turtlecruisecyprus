@@ -242,9 +242,9 @@ def confirm_booking_from_payment_intent(payment_intent_id: str, raw_status: str 
 
 @transaction.atomic
 def confirm_booking_from_checkout_session(session: dict) -> Payment:
-    session_id = session["id"]
+    session_id = _stripe_object_id(session.get("id")) or session["id"]
     payment = Payment.objects.select_for_update().select_related("booking").get(stripe_checkout_session_id=session_id)
-    payment_intent_id = session.get("payment_intent") or payment.stripe_payment_intent_id or ""
+    payment_intent_id = _stripe_object_id(session.get("payment_intent")) or payment.stripe_payment_intent_id or ""
     return _finalize_successful_payment(payment, payment_intent_id, session.get("status", "complete"))
 
 
@@ -297,20 +297,33 @@ def verify_payment_intent_and_confirm(booking: Booking, payment_intent_id: str) 
 
 
 def verify_checkout_session_and_confirm(booking: Booking, session_id: str) -> Payment:
+    if booking.status == Booking.Status.CONFIRMED:
+        payment = (
+            Payment.objects.filter(booking=booking, status=Payment.Status.SUCCEEDED)
+            .order_by("-id")
+            .first()
+        )
+        if payment:
+            return payment
+
     session = retrieve_checkout_session(session_id)
     if session["status"] != "complete":
         raise ValueError(f"Checkout Session is not complete: {session['status']}")
+    payment_intent_id = _stripe_object_id(session.get("payment_intent"))
     payment, _ = Payment.objects.get_or_create(
         booking=booking,
         stripe_checkout_session_id=session_id,
         defaults={
             "amount": booking.total_amount,
             "currency": booking.currency,
-            "idempotency_key": f"booking:{booking.public_id}:manual-confirm:{session_id}",
+            "idempotency_key": f"booking:{booking.public_id}:manual-confirm:{session_id}"[:160],
             "raw_provider_status": session["status"],
-            "stripe_payment_intent_id": session.get("payment_intent"),
+            "stripe_payment_intent_id": payment_intent_id,
         },
     )
+    if payment_intent_id and not payment.stripe_payment_intent_id:
+        payment.stripe_payment_intent_id = payment_intent_id
+        payment.save(update_fields=["stripe_payment_intent_id", "updated_at"])
     if payment.status != Payment.Status.SUCCEEDED:
         return confirm_booking_from_checkout_session(session)
     return payment

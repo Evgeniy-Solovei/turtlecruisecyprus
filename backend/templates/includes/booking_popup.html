@@ -80,11 +80,12 @@
                   <li>{{ t.term_6 }}</li>
                 </ul>
               </div>
-              <label class="tc-checkbox">
+              <label class="tc-checkbox" id="tcTermsAgreeWrap">
                 <input type="checkbox" id="tcTermsAgree" name="terms_agree">
                 <span class="tc-checkbox__box"></span>
                 <span class="tc-checkbox__label">{{ t.agree_terms }}</span>
               </label>
+              <div id="tcTermsError" class="tc-field-error" role="alert" hidden></div>
             </div>
           </div>
           <div class="tc-step__summary">

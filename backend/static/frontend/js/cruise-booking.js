@@ -149,25 +149,47 @@
   function tc_handle_payment_return() {
     var urlParams = new URLSearchParams(window.location.search);
     var sessionId = urlParams.get('session_id');
-    var bookingId = localStorage.getItem('tc_pending_booking_id');
-    if (!sessionId && !bookingId) return;
+    var bookingId = urlParams.get('booking_id') || localStorage.getItem('tc_pending_booking_id');
+    if (!sessionId || !bookingId) return;
 
     localStorage.removeItem('tc_pending_booking_id');
     apiPost('/payments/stripe/confirm/', {
-      booking_id: bookingId || '',
+      booking_id: bookingId,
       checkout_session_id: sessionId,
     }).done(function() {
-      tcTrack('payment_completed', { step: '4', completed: true, booking_id: bookingId || state.bookingId });
-      if (tcBooking.thankYouUrl) {
+      tcTrack('payment_completed', { step: '4', completed: true, booking_id: bookingId });
+      if (tcBooking.thankYouUrl && window.location.pathname.indexOf('/thank-you') === -1) {
         window.location.href = tcBooking.thankYouUrl;
       }
-    }).fail(function() {
-      alert('Payment verification failed. Please contact us with your booking details.');
+    }).fail(function(xhr) {
+      apiGet('/bookings/' + encodeURIComponent(bookingId) + '/status/')
+        .done(function(data) {
+          if (data.status === 'confirmed') {
+            if (window.history && window.history.replaceState) {
+              window.history.replaceState({}, document.title, window.location.pathname);
+            }
+            return;
+          }
+          var msg = (tcBooking.i18n.paymentConfirmFailed || '').replace('{booking_id}', bookingId);
+          if (!msg) msg = apiErrorMessage(xhr);
+          if (window.location.pathname.indexOf('/thank-you') !== -1) {
+            var $box = $('#tcThankYouConfirmError');
+            if ($box.length) {
+              $box.text(msg).prop('hidden', false);
+            }
+          } else {
+            alert(msg);
+          }
+        })
+        .fail(function() {
+          var msg = (tcBooking.i18n.paymentConfirmFailed || '').replace('{booking_id}', bookingId);
+          alert(msg || apiErrorMessage(xhr));
+        });
+    }).always(function() {
+      if (window.history && window.history.replaceState && window.location.search.indexOf('session_id=') !== -1) {
+        window.history.replaceState({}, document.title, window.location.pathname);
+      }
     });
-
-    if (window.history && window.history.replaceState) {
-      window.history.replaceState({}, document.title, window.location.pathname);
-    }
   }
 
   tc_handle_payment_return();
