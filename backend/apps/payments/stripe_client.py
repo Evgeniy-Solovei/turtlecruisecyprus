@@ -12,7 +12,9 @@ class StripeNotConfigured(RuntimeError):
 
 
 STRIPE_CHECKOUT_MIN_MINUTES = 30
-STRIPE_CHECKOUT_MAX_HOURS = 24
+# Stripe rejects expires_at at exactly +24h; keep a small safety margin.
+STRIPE_CHECKOUT_MAX_HOURS = 23
+STRIPE_CHECKOUT_MAX_MINUTES = 55
 
 
 def _stripe():
@@ -31,7 +33,7 @@ def amount_to_cents(amount: Decimal) -> int:
 def checkout_session_expires_at() -> int:
     """Stripe требует expires_at (мин. 30 мин, макс. 24 ч). Sold out закрываем отдельно через expire_checkout_session."""
     now = timezone.now()
-    return int((now + timedelta(hours=STRIPE_CHECKOUT_MAX_HOURS)).timestamp())
+    return int((now + timedelta(hours=STRIPE_CHECKOUT_MAX_HOURS, minutes=STRIPE_CHECKOUT_MAX_MINUTES)).timestamp())
 
 
 def checkout_expires_at(checkout_deadline: datetime | None = None) -> int:
@@ -40,7 +42,7 @@ def checkout_expires_at(checkout_deadline: datetime | None = None) -> int:
     if checkout_deadline is None:
         return checkout_session_expires_at()
     stripe_min = now + timedelta(minutes=STRIPE_CHECKOUT_MIN_MINUTES)
-    stripe_max = now + timedelta(hours=STRIPE_CHECKOUT_MAX_HOURS)
+    stripe_max = now + timedelta(hours=STRIPE_CHECKOUT_MAX_HOURS, minutes=STRIPE_CHECKOUT_MAX_MINUTES)
     expires = checkout_deadline
     if expires < stripe_min:
         expires = stripe_min

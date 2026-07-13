@@ -15,6 +15,7 @@ from apps.notifications.tasks import send_admin_booking_email, send_admin_sms, s
 from .models import Payment
 from .stripe_client import (
     STRIPE_CHECKOUT_MAX_HOURS,
+    STRIPE_CHECKOUT_MAX_MINUTES,
     checkout_session_expires_at,
     create_checkout_session,
     retrieve_checkout_session,
@@ -22,9 +23,17 @@ from .stripe_client import (
 )
 
 
+def _stripe_object_id(value) -> str | None:
+    if not value:
+        return None
+    if isinstance(value, str):
+        return value
+    return getattr(value, "id", None) or str(value)
+
+
 def checkout_deadline_for_payment(payment: Payment) -> datetime:
     """Когда Stripe сам закроет эту checkout session (технический срок, не бизнес-логика)."""
-    return payment.created_at + timedelta(hours=STRIPE_CHECKOUT_MAX_HOURS)
+    return payment.created_at + timedelta(hours=STRIPE_CHECKOUT_MAX_HOURS, minutes=STRIPE_CHECKOUT_MAX_MINUTES)
 
 
 def create_or_get_payment_intent(booking: Booking) -> Payment:
@@ -85,16 +94,19 @@ def create_or_get_payment_intent(booking: Booking) -> Payment:
         return_url=return_url,
         expires_at=expires_unix,
     )
+    client_secret = session.get("client_secret")
+    if not client_secret:
+        raise RuntimeError("Stripe Checkout Session did not return client_secret.")
     payment = Payment.objects.create(
         booking=booking,
         amount=booking.total_amount,
         currency=booking.currency,
-        stripe_checkout_session_id=session["id"],
-        stripe_payment_intent_id=session.get("payment_intent"),
-        provider_client_secret=session["client_secret"],
+        stripe_checkout_session_id=_stripe_object_id(session.get("id")) or "",
+        stripe_payment_intent_id=_stripe_object_id(session.get("payment_intent")),
+        provider_client_secret=client_secret,
         idempotency_key=idempotency_key,
-        raw_provider_status=session["status"],
-        status=_map_checkout_session_status(session["status"]),
+        raw_provider_status=session.get("status", ""),
+        status=_map_checkout_session_status(session.get("status", "")),
     )
     log_operation(
         category="payment",

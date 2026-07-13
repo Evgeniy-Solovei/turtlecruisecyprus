@@ -1,5 +1,8 @@
 from __future__ import annotations
 
+import logging
+
+from django.db import DatabaseError
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from rest_framework import status
@@ -12,22 +15,38 @@ from .services import checkout_deadline_for_payment, create_or_get_payment_inten
 from .stripe_client import StripeNotConfigured
 from .webhooks import handle_stripe_webhook
 
+logger = logging.getLogger(__name__)
+
+
+def _stripe_error_response(exc: Exception) -> Response | None:
+    module = type(exc).__module__
+    if not module.startswith("stripe"):
+        return None
+    message = getattr(exc, "user_message", None) or str(exc)
+    return Response({"detail": message}, status=status.HTTP_502_BAD_GATEWAY)
+
 
 @api_view(["POST"])
 def stripe_payment_intent(request):
-    booking = get_object_or_404(Booking.objects.select_related("cruise"), public_id=request.data["booking_id"])
+    booking_id = request.data.get("booking_id")
+    if not booking_id:
+        return Response({"detail": "booking_id is required."}, status=status.HTTP_400_BAD_REQUEST)
+    booking = get_object_or_404(Booking.objects.select_related("cruise"), public_id=booking_id)
     try:
         payment = create_or_get_payment_intent(booking)
     except StripeNotConfigured as exc:
         return Response({"detail": str(exc)}, status=status.HTTP_503_SERVICE_UNAVAILABLE)
     except ValueError as exc:
         return Response({"detail": str(exc)}, status=status.HTTP_410_GONE)
+    except DatabaseError as exc:
+        logger.exception("payment_intent db error booking=%s", booking.public_id)
+        return Response({"detail": "Payment record could not be saved."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
     except Exception as exc:
-        stripe_error = type(exc).__module__.startswith("stripe")
-        if stripe_error:
-            message = getattr(exc, "user_message", None) or str(exc)
-            return Response({"detail": message}, status=status.HTTP_502_BAD_GATEWAY)
-        raise
+        stripe_response = _stripe_error_response(exc)
+        if stripe_response is not None:
+            return stripe_response
+        logger.exception("payment_intent failed booking=%s", booking.public_id)
+        return Response({"detail": "Payment setup failed."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
     return Response(
         {
             "payment_id": payment.id,
