@@ -23,7 +23,7 @@ class Payment(models.Model):
     stripe_charge_id = models.CharField("Stripe Charge ID", max_length=128, blank=True)
     stripe_customer_id = models.CharField("Stripe Customer ID", max_length=128, blank=True)
     transaction_id = models.CharField("Внешний transaction ID", max_length=128, blank=True)
-    provider_client_secret = models.CharField("Stripe client secret", max_length=255, blank=True, help_text="Не показывать клиенту вне платежного flow.")
+    provider_client_secret = models.CharField("Stripe client secret", max_length=1024, blank=True, help_text="Не показывать клиенту вне платежного flow.")
     idempotency_key = models.CharField("Ключ идемпотентности", max_length=160, unique=True)
     raw_provider_status = models.CharField("Исходный статус провайдера", max_length=128, blank=True)
     created_at = models.DateTimeField("Создано", auto_now_add=True)
