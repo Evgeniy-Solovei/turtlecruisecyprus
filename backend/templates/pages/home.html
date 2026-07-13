@@ -1,2 +1,8 @@
 {% extends "base.html" %}
-{% block content %}{% include "pages/wp/home_content.html" %}{% endblock %}
+{% block content %}
+  {% if page_html %}
+    {{ page_html|safe }}
+  {% elif content_partial %}
+    {% include content_partial %}
+  {% endif %}
+{% endblock %}

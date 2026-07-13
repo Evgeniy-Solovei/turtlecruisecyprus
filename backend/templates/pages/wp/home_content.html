@@ -1,7 +1,13 @@
 {% load static %}
 <section class="hero">
       <div class="bg-block">
-        <img src="{% static 'frontend/img/dist/hero-bg.jpg' %}" alt="">
+        {% if site_home.media.bg_desktop.kind == "media" %}
+        <img src="{{ site_home.media.bg_desktop.url }}" class="d-none d-md-block" alt="">
+        <img src="{{ site_home.media.bg_mobile.url }}" class="d-block d-md-none" alt="">
+        {% else %}
+        <img src="{% static site_home.media.bg_desktop.url %}" class="d-none d-md-block" alt="">
+        <img src="{% static site_home.media.bg_mobile.url %}" class="d-block d-md-none" alt="">
+        {% endif %}
         <div class="hero__gradient"></div>
       </div>
       <div class="container">
@@ -24,8 +30,8 @@
 
         <div class="hero__center">
 
-          <div class="hero__rating">
-            <span class="hero__rating-num">4.9</span>
+          <a href="{{ site_rating.url }}" target="_blank" rel="noopener noreferrer" class="hero__rating">
+            <span class="hero__rating-num">{{ site_rating.score }}</span>
             <div class="hero__rating-right">
               <div class="hero__stars">
                 <svg width="20" height="19" viewBox="0 0 20 19" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -44,35 +50,39 @@
                   <path d="M3.825 19L5.45 11.975L0 7.25L7.2 6.625L10 0L12.8 6.625L20 7.25L14.55 11.975L16.175 19L10 15.275L3.825 19Z" fill="white" />
                 </svg>
               </div>
-              <span class="hero__rating-label">Based on 719 reviews</span>
+              <span class="hero__rating-label">{{ site_rating.label }}</span>
             </div>
-          </div>
+          </a>
 
           <div class="hero__titles">
-            <h1>Some things you just <em>have to see</em></h1>
-            <p class="hero__sub">Morning or sunset. Turtles almost guaranteed. Small group, big memory.</p>
+            <h1>{{ site_home.copy.hero_title|safe }}</h1>
+            <p class="hero__sub">{{ site_home.copy.hero_sub }}</p>
           </div>
 
         </div>
 
         <div class="hero__cruises">
-          <p class="hero__choose">Choose your cruise</p>
+          <p class="hero__choose">{{ site_home.copy.choose_cruise }}</p>
           <div class="hero__tours">
 
-            <button type="button" class="hero__tour" data-cruise-open="morning">
+            <a href="{{ site_home.morning_tour_url }}" class="hero__tour">
               <div class="hero__tour-img">
-                <img src="{% static 'frontend/img/dist/morning-cruise.jpg' %}" alt="Morning Cruise">
+                {% if site_home.media.morning_tour.kind == "media" %}
+                <img src="{{ site_home.media.morning_tour.url }}" alt="Morning Cruise">
+                {% else %}
+                <img src="{% static site_home.media.morning_tour.url %}" alt="Morning Cruise">
+                {% endif %}
               </div>
               <div class="hero__tour-info">
-                <h3><em>Morning</em> Cruise</h3>
+                <h3>{{ site_home.copy.morning_tour_title|safe }}</h3>
                 <div class="hero__tour-meta">
                   <div class="hero__tour-time">
                     <svg width="19" height="19" viewBox="0 0 19 19" fill="none" xmlns="http://www.w3.org/2000/svg">
                       <path d="M9.79688 5.93752V9.33228L12.6216 11.0267C12.6892 11.0672 12.7378 11.133 12.7569 11.2094C12.7759 11.2858 12.7639 11.3666 12.7233 11.4342C12.6828 11.5017 12.6171 11.5503 12.5406 11.5694C12.4642 11.5885 12.3834 11.5764 12.3159 11.5358L9.34711 9.75459C9.30318 9.72819 9.26683 9.69087 9.24159 9.64626C9.21636 9.60165 9.20311 9.55127 9.20312 9.50002V5.93752C9.20312 5.85878 9.2344 5.78327 9.29008 5.72759C9.34575 5.67192 9.42126 5.64064 9.5 5.64064C9.57874 5.64064 9.65425 5.67192 9.70992 5.72759C9.7656 5.78327 9.79688 5.85878 9.79688 5.93752ZM9.5 2.67189C8.60249 2.6699 7.7135 2.84599 6.88451 3.18996C6.05553 3.53394 5.30303 4.03897 4.67059 4.6758C3.9373 5.41799 3.31461 6.12084 2.67188 6.89197V4.75002C2.67188 4.67128 2.6406 4.59577 2.58492 4.54009C2.52925 4.48442 2.45374 4.45314 2.375 4.45314C2.29626 4.45314 2.22075 4.48442 2.16508 4.54009C2.1094 4.59577 2.07812 4.67128 2.07812 4.75002V7.71877C2.07812 7.7975 2.1094 7.87301 2.16508 7.92869C2.22075 7.98436 2.29626 8.01564 2.375 8.01564H5.34375C5.42249 8.01564 5.498 7.98436 5.55367 7.92869C5.60935 7.87301 5.64062 7.7975 5.64062 7.71877C5.64062 7.64003 5.60935 7.56452 5.55367 7.50884C5.498 7.45317 5.42249 7.42189 5.34375 7.42189H3.00363C3.68199 6.60549 4.32695 5.8633 5.09141 5.09142C5.95783 4.22494 7.06039 3.633 8.26131 3.38955C9.46223 3.1461 10.7083 3.26195 11.8437 3.72262C12.9792 4.18329 13.9537 4.96835 14.6456 5.97971C15.3374 6.99107 15.7158 8.18389 15.7336 9.40911C15.7514 10.6343 15.4078 11.8376 14.7456 12.8687C14.0834 13.8997 13.1321 14.7127 12.0105 15.2062C10.8889 15.6996 9.64677 15.8516 8.43928 15.6431C7.23179 15.4347 6.11251 14.875 5.22129 14.034C5.16401 13.9799 5.08757 13.9507 5.00879 13.953C4.93001 13.9552 4.85534 13.9886 4.80121 14.0459C4.74708 14.1032 4.71792 14.1796 4.72015 14.2584C4.72237 14.3372 4.75581 14.4119 4.81309 14.466C5.62365 15.2309 6.60913 15.7858 7.6835 16.0822C8.75787 16.3786 9.88846 16.4076 10.9766 16.1665C12.0647 15.9254 13.0773 15.4216 13.9259 14.6991C14.7745 13.9766 15.4333 13.0574 15.8449 12.0217C16.2565 10.9859 16.4083 9.86521 16.2871 8.75732C16.1659 7.64942 15.7753 6.58804 15.1495 5.66583C14.5236 4.74362 13.6816 3.98863 12.6968 3.46675C11.7121 2.94487 10.6145 2.67198 9.5 2.67189Z" fill="white" />
                     </svg>
-                    <span>9:30 – 14:00</span>
+                    <span>{{ site_home.copy.morning_tour_time }}</span>
                   </div>
-                  <p>The best time to spot turtles.</p>
+                  <p>{{ site_home.copy.morning_tour_desc }}</p>
                 </div>
               </div>
               <div class="hero__tour-price">
@@ -83,20 +93,24 @@
               </div>
             </a>
 
-            <button type="button" class="hero__tour" data-cruise-open="sunset">
+            <a href="{{ site_home.sunset_tour_url }}" class="hero__tour">
               <div class="hero__tour-img">
-                <img src="{% static 'frontend/img/dist/sunset-cruise.jpg' %}" alt="Sunset Cruise">
+                {% if site_home.media.sunset_tour.kind == "media" %}
+                <img src="{{ site_home.media.sunset_tour.url }}" alt="Sunset Cruise">
+                {% else %}
+                <img src="{% static site_home.media.sunset_tour.url %}" alt="Sunset Cruise">
+                {% endif %}
               </div>
               <div class="hero__tour-info">
-                <h3><em>Sunset</em> Cruise</h3>
+                <h3>{{ site_home.copy.sunset_tour_title|safe }}</h3>
                 <div class="hero__tour-meta">
                   <div class="hero__tour-time">
                     <svg width="19" height="19" viewBox="0 0 19 19" fill="none" xmlns="http://www.w3.org/2000/svg">
                       <path d="M9.79688 5.93752V9.33228L12.6216 11.0267C12.6892 11.0672 12.7378 11.133 12.7569 11.2094C12.7759 11.2858 12.7639 11.3666 12.7233 11.4342C12.6828 11.5017 12.6171 11.5503 12.5406 11.5694C12.4642 11.5885 12.3834 11.5764 12.3159 11.5358L9.34711 9.75459C9.30318 9.72819 9.26683 9.69087 9.24159 9.64626C9.21636 9.60165 9.20311 9.55127 9.20312 9.50002V5.93752C9.20312 5.85878 9.2344 5.78327 9.29008 5.72759C9.34575 5.67192 9.42126 5.64064 9.5 5.64064C9.57874 5.64064 9.65425 5.67192 9.70992 5.72759C9.7656 5.78327 9.79688 5.85878 9.79688 5.93752ZM9.5 2.67189C8.60249 2.6699 7.7135 2.84599 6.88451 3.18996C6.05553 3.53394 5.30303 4.03897 4.67059 4.6758C3.9373 5.41799 3.31461 6.12084 2.67188 6.89197V4.75002C2.67188 4.67128 2.6406 4.59577 2.58492 4.54009C2.52925 4.48442 2.45374 4.45314 2.375 4.45314C2.29626 4.45314 2.22075 4.48442 2.16508 4.54009C2.1094 4.59577 2.07812 4.67128 2.07812 4.75002V7.71877C2.07812 7.7975 2.1094 7.87301 2.16508 7.92869C2.22075 7.98436 2.29626 8.01564 2.375 8.01564H5.34375C5.42249 8.01564 5.498 7.98436 5.55367 7.92869C5.60935 7.87301 5.64062 7.7975 5.64062 7.71877C5.64062 7.64003 5.60935 7.56452 5.55367 7.50884C5.498 7.45317 5.42249 7.42189 5.34375 7.42189H3.00363C3.68199 6.60549 4.32695 5.8633 5.09141 5.09142C5.95783 4.22494 7.06039 3.633 8.26131 3.38955C9.46223 3.1461 10.7083 3.26195 11.8437 3.72262C12.9792 4.18329 13.9537 4.96835 14.6456 5.97971C15.3374 6.99107 15.7158 8.18389 15.7336 9.40911C15.7514 10.6343 15.4078 11.8376 14.7456 12.8687C14.0834 13.8997 13.1321 14.7127 12.0105 15.2062C10.8889 15.6996 9.64677 15.8516 8.43928 15.6431C7.23179 15.4347 6.11251 14.875 5.22129 14.034C5.16401 13.9799 5.08757 13.9507 5.00879 13.953C4.93001 13.9552 4.85534 13.9886 4.80121 14.0459C4.74708 14.1032 4.71792 14.1796 4.72015 14.2584C4.72237 14.3372 4.75581 14.4119 4.81309 14.466C5.62365 15.2309 6.60913 15.7858 7.6835 16.0822C8.75787 16.3786 9.88846 16.4076 10.9766 16.1665C12.0647 15.9254 13.0773 15.4216 13.9259 14.6991C14.7745 13.9766 15.4333 13.0574 15.8449 12.0217C16.2565 10.9859 16.4083 9.86521 16.2871 8.75732C16.1659 7.64942 15.7753 6.58804 15.1495 5.66583C14.5236 4.74362 13.6816 3.98863 12.6968 3.46675C11.7121 2.94487 10.6145 2.67198 9.5 2.67189Z" fill="white" />
                     </svg>
-                    <span>16:00 – 20:00</span>
+                    <span>{{ site_home.copy.sunset_tour_time }}</span>
                   </div>
-                  <p>Golden light, calmer seas.</p>
+                  <p>{{ site_home.copy.sunset_tour_desc }}</p>
                 </div>
               </div>
               <div class="hero__tour-price">
@@ -120,50 +134,33 @@
       <div class="container">
 
         <div class="benefits__header">
-          <h2>What Makes Us <em>Different</em></h2>
-          <p>Family-owned. Freshly cooked. Truly personal.</p>
+          <h2>{{ site_benefits.header_title|safe }}</h2>
+          <p>{{ site_benefits.header_sub }}</p>
         </div>
 
         <div class="benefits__grid">
 
+          {% for item in site_benefits.items %}
           <div class="benefits__card">
             <div class="benefits__card-img">
-              <img src="{% static 'frontend/img/dist/benefit-1.jpg' %}" alt="A Catamaran">
+              {% if item.image.kind == "media" %}
+              <img src="{{ item.image.url }}" alt="{{ item.image.alt }}">
+              {% else %}
+              <img src="{% static item.image.url %}" alt="{{ item.image.alt }}">
+              {% endif %}
             </div>
-            <h3 class="benefits__card-title"><em>A Catamaran.</em> Not Just Boat</h3>
+            <h3 class="benefits__card-title">{{ item.title|safe }}</h3>
             <div class="benefits__card-body">
-              <p class="benefits__card-lead">Two decks. Stable on the water. No seasickness.</p>
-              <p>Close enough to swim into sea caves. And we keep the group small – half the size of every other vessel out there. Because some things are better without the crowd.</p>
+              <p class="benefits__card-lead">{{ item.lead }}</p>
+              <p>{{ item.body }}</p>
             </div>
+            {% if item.video_url %}
             <div class="flex-btn">
-              <a href="#" class="benefits__card-btn">WATCH NOW</a>
+              <a href="{{ item.video_url }}" class="benefits__card-btn" data-fancybox data-type="iframe">{{ item.button_label }}</a>
             </div>
+            {% endif %}
           </div>
-
-          <div class="benefits__card">
-            <div class="benefits__card-img">
-              <img src="{% static 'frontend/img/dist/benefit-2.jpg' %}" alt="Made this morning">
-            </div>
-            <h3 class="benefits__card-title"><em>Made this morning.</em> Real food.</h3>
-            <div class="benefits__card-body">
-              <p class="benefits__card-lead">Not mass-produced chicken.</p>
-              <p>Every dish is cooked fresh from home recipes before we leave the harbour. Grilled chicken and halloumi – done right on deck, while you sail. Nobody else in Ayia Napa does this. Nobody.</p>
-            </div>
-            <div class="flex-btn">
-              <a href="#" class="benefits__card-btn">WATCH NOW</a>
-            </div>
-          </div>
-
-          <div class="benefits__card">
-            <div class="benefits__card-img">
-              <img src="{% static 'frontend/img/dist/benefit-3.jpg' %}" alt="Captain Jimmy">
-            </div>
-            <h3 class="benefits__card-title">Captain <em>Jimmy</em></h3>
-            <div class="benefits__card-body">
-              <p class="benefits__card-lead">35 years as a professional diver.</p>
-              <p>Built this boat from scratch. A family business – and you feel it the moment you step on board. People come back to Cyprus and ask: "Is it the same captain this year?" Yes. Always.</p>
-            </div>
-          </div>
+          {% endfor %}
 
         </div>
       </div>
@@ -194,7 +191,7 @@
                 <span class="offers__price">45€ with BBQ</span>
               </div>
             </div>
-            <a href="/chill-cruise/" class="offers__btn"><span>MORE DETAILS</span></a>
+            <a href="/chill-cruise/" class="offers__btn">{% include "includes/icon_offers_turtle.html" %}<span>More Details</span></a>
             <div class="offers__arrow">
               <svg width="40" height="36" viewBox="0 0 40 36" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M24.0931 0.277625L39.745 17.3298C39.8258 17.4177 39.89 17.5222 39.9337 17.6372C39.9775 17.7522 40 17.8755 40 18C40 18.1245 39.9775 18.2478 39.9337 18.3628C39.89 18.4778 39.8258 18.5823 39.745 18.6702L24.0931 35.7224C23.9299 35.9001 23.7086 36 23.4779 36C23.2471 36 23.0258 35.9001 22.8627 35.7224C22.6995 35.5446 22.6078 35.3035 22.6078 35.0521C22.6078 34.8007 22.6995 34.5596 22.8627 34.3819L37.0298 18.9473L0.86955 18.9473C0.638931 18.9473 0.417757 18.8475 0.254685 18.6699C0.0916126 18.4922 -6.8962e-07 18.2513 -6.99382e-07 18C-7.09144e-07 17.7488 0.0916125 17.5078 0.254685 17.3301C0.417757 17.1525 0.638931 17.0527 0.86955 17.0527L37.0298 17.0527L22.8627 1.61811C22.6995 1.44035 22.6078 1.19926 22.6078 0.947871C22.6078 0.696479 22.6995 0.455386 22.8627 0.277625C23.0258 0.0998676 23.2471 2.67151e-06 23.4779 2.66017e-06C23.7086 2.64882e-06 23.9299 0.0998676 24.0931 0.277625Z" fill="white" />
@@ -223,7 +220,7 @@
                 <span class="offers__price">35€</span>
               </div>
             </div>
-            <a href="/sunset-cruise/" class="offers__btn"><span>MORE DETAILS</span></a>
+            <a href="/sunset-cruise/" class="offers__btn">{% include "includes/icon_offers_turtle.html" %}<span>More Details</span></a>
             <div class="offers__arrow">
               <svg width="40" height="36" viewBox="0 0 40 36" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M24.0931 0.277625L39.745 17.3298C39.8258 17.4177 39.89 17.5222 39.9337 17.6372C39.9775 17.7522 40 17.8755 40 18C40 18.1245 39.9775 18.2478 39.9337 18.3628C39.89 18.4778 39.8258 18.5823 39.745 18.6702L24.0931 35.7224C23.9299 35.9001 23.7086 36 23.4779 36C23.2471 36 23.0258 35.9001 22.8627 35.7224C22.6995 35.5446 22.6078 35.3035 22.6078 35.0521C22.6078 34.8007 22.6995 34.5596 22.8627 34.3819L37.0298 18.9473L0.86955 18.9473C0.638931 18.9473 0.417757 18.8475 0.254685 18.6699C0.0916126 18.4922 -6.8962e-07 18.2513 -6.99382e-07 18C-7.09144e-07 17.7488 0.0916125 17.5078 0.254685 17.3301C0.417757 17.1525 0.638931 17.0527 0.86955 17.0527L37.0298 17.0527L22.8627 1.61811C22.6995 1.44035 22.6078 1.19926 22.6078 0.947871C22.6078 0.696479 22.6995 0.455386 22.8627 0.277625C23.0258 0.0998676 23.2471 2.67151e-06 23.4779 2.66017e-06C23.7086 2.64882e-06 23.9299 0.0998676 24.0931 0.277625Z" fill="white" />

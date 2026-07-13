@@ -26,6 +26,17 @@ def phone_digits(value: str) -> str:
 
 
 @register.filter
+def youtube_embed(value: str) -> str:
+    url = (value or "").strip()
+    if not url or "youtube-nocookie.com/embed/" in url:
+        return url
+    match = re.search(r"(?:shorts/|v=|embed/|youtu\.be/)([\w-]{11})", url)
+    if not match:
+        return url
+    return f"https://www.youtube-nocookie.com/embed/{match.group(1)}?rel=0"
+
+
+@register.filter
 def stars_for(item: dict, global_stars: int = 5) -> int:
     try:
         return int(item.get("stars") or global_stars)

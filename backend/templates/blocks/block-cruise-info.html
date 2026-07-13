@@ -19,7 +19,7 @@
       {% endif %}
       {% if d.btn_filled_text or d.btn_outline_text %}
       <div class="cruise-info__actions">
-        {% if d.btn_filled_text %}<a href="{{ d.btn_filled_url|default:'#' }}" class="cruise-info__btn cruise-info__btn--filled" data-fancybox data-type="iframe">{{ d.btn_filled_text }}</a>{% endif %}
+        {% if d.btn_filled_text %}<a href="{{ d.btn_filled_url|default:'#'|youtube_embed }}" class="cruise-info__btn cruise-info__btn--filled" data-fancybox data-type="iframe">{{ d.btn_filled_text }}</a>{% endif %}
         {% if d.btn_outline_text %}<a href="{{ d.btn_outline_url|default:'#' }}" class="cruise-info__btn cruise-info__btn--outline" data-fancybox>{{ d.btn_outline_text }}</a>{% endif %}
       </div>
       {% endif %}

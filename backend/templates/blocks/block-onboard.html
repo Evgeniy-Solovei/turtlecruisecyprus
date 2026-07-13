@@ -19,7 +19,7 @@
                 <div class="onboard__gradient"></div>
               </div>
               {% if slide.video_url %}
-              <a href="{{ slide.video_url }}" data-fancybox data-type="iframe" class="onboard__play">▶</a>
+              <a href="{{ slide.video_url|youtube_embed }}" data-fancybox data-type="iframe" class="onboard__play">▶</a>
               {% endif %}
               <div class="onboard__card-body">
                 {% if slide.title %}<h3>{{ slide.title }}</h3>{% endif %}

@@ -26,6 +26,17 @@ MIN_IMPORTED_BODY = 2000
 RESERVED_SLUGS = {key.rstrip("/") for key in PAGES} | {key.rstrip("/") for key in REDIRECTS}
 
 
+def _localized_content_partial(locale: str, partial: str) -> str:
+    if not partial or locale == DEFAULT_LOCALE:
+        return partial
+    from django.conf import settings
+
+    candidate = partial.replace("pages/wp/", f"pages/wp/{locale}/")
+    if (settings.BASE_DIR / "templates" / candidate).is_file():
+        return candidate
+    return partial
+
+
 def _page_context(request, path: str) -> dict:
     locale = getattr(request, "locale", DEFAULT_LOCALE)
     slug = path.rstrip("/")
@@ -34,6 +45,7 @@ def _page_context(request, path: str) -> dict:
         raise Http404
 
     template_name, body_class, content_partial = entry
+    content_partial = _localized_content_partial(locale, content_partial)
     ctx: dict = {
         "body_class": body_class,
         "content_partial": content_partial,

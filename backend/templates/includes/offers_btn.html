@@ -1,0 +1,5 @@
+{% if url %}
+<a href="{{ url }}" class="offers__btn">{% include "includes/icon_offers_turtle.html" %}<span>{{ label|default:"More Details" }}</span></a>
+{% elif booking_trigger %}
+<button type="button" data-cruise-open="{{ booking_trigger }}" class="offers__btn">{% include "includes/icon_offers_turtle.html" %}<span>{{ label|default:"More Details" }}</span></button>
+{% endif %}

@@ -329,8 +329,8 @@ def footer_nav_cols_for_locale(locale: str) -> list[list[dict[str, str]]]:
 
 def footer_legal_for_locale(locale: str) -> list[dict[str, str]]:
     t = SITE_I18N.get(locale, SITE_I18N["en"])
+    # Match prod footer: Terms + Fulfillment only (no Privacy Policy link).
     return [
         {"title": t["footer_terms"], "url": localized_path(locale, "/terms-conditions/")},
         {"title": t["footer_fulfillment"], "url": localized_path(locale, "/fulfillment-policy/")},
-        {"title": t["footer_privacy"], "url": localized_path(locale, "/privacy-policy/")},
     ]

@@ -23,7 +23,7 @@
         {% if item.link or item.video_url %}
         <div class="flex-btn">
           {% if item.video_url %}
-          <a href="{{ item.video_url }}" class="benefits__card-btn" data-fancybox data-type="iframe">{{ item.link.title|default:"Watch Video" }}</a>
+          <a href="{{ item.video_url|youtube_embed }}" class="benefits__card-btn" data-fancybox data-type="iframe">{{ item.link.title|default:"Watch Video" }}</a>
           {% elif item.link %}
           <a href="{{ item.link.url }}" class="benefits__card-btn"{% if item.link.target %} target="{{ item.link.target }}"{% endif %}>{{ item.link.title }}</a>
           {% endif %}

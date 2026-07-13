@@ -1,0 +1,66 @@
+/* From WP theme style.css — required on top of main.min.css */
+
+.card-link {
+  position: absolute;
+  inset: 0;
+  z-index: 30;
+}
+
+.offers__card-body {
+  padding-bottom: 3.5rem;
+}
+
+.offers__btn {
+  background: transparent;
+  position: absolute;
+  z-index: 999;
+  left: 2.3125rem;
+  bottom: 2.3125rem;
+}
+
+.guest-photos .gallery__arrow {
+  background: transparent;
+}
+
+.post-hero__breadcrumb {
+  position: relative;
+  z-index: 9;
+}
+
+body.gallery .gallery__masonry:before,
+body.gallery .gallery__masonry:after {
+  display: none !important;
+}
+
+.iti__dropdown-content,
+.iti--container {
+  z-index: 999999 !important;
+}
+
+.iti--container {
+  position: absolute !important;
+}
+
+@media (max-width: 767.98px) {
+  .offers__card-body {
+    padding-bottom: 2.9375rem;
+  }
+
+  .offers__btn {
+    left: 1rem;
+    bottom: 1.0625rem;
+  }
+
+  .about-slider__swiper .swiper-slide > div {
+    height: 100%;
+  }
+
+  .lang-de .route__btn,
+  .lang-de .review-slider__btn {
+    font-size: 1.5rem;
+  }
+
+  .lang-de .book__btn {
+    font-size: 1.85rem;
+  }
+}

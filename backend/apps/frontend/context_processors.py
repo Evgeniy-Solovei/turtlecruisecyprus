@@ -19,7 +19,9 @@ from .i18n import (
     nav_for_locale,
 )
 from .seo import default_seo_meta
+from .google_rating import get_site_rating
 from .services import build_booking_config
+from .site_content import benefits_context, home_context
 
 
 def _cruise_cards():
@@ -63,9 +65,15 @@ def booking_config(request):
     if locale != DEFAULT_LOCALE and path.startswith(f"/{locale}"):
         path = path[len(locale) + 1 :] or "/"
 
+    rating = get_site_rating()
+    rating_label = rating["label_de"] if locale == "de" else rating["label_en"]
+
     return {
         "booking_config_json": json.dumps(config),
         "cruise_cards": _cruise_cards(),
+        "site_rating": {**rating, "label": rating_label},
+        "site_home": home_context(locale),
+        "site_benefits": benefits_context(locale),
         "site": {
             "lang": locale,
             "prefix": locale_prefix(locale),
@@ -82,6 +90,8 @@ def booking_config(request):
                 "made_by_url": footer.get("made_by_url", ""),
                 "made_by_logo": footer.get("made_by_logo", ""),
                 "footer_logo": footer.get("footer_logo", ""),
+                "bg_desktop": locale_footer.get("bg_desktop", ""),
+                "bg_mobile": locale_footer.get("bg_mobile", ""),
             },
             "socials": socials or {
                 "tiktok": "https://www.tiktok.com/",

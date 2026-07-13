@@ -21,10 +21,12 @@
           </div>
         </div>
         {% if item.btn_label %}
-          {% if item.booking_trigger == "morning" or item.booking_trigger == "sunset" %}
-          <button type="button" data-cruise-open="{{ item.booking_trigger }}" class="offers__btn"><span>{{ item.btn_label }}</span></button>
+          {% if item.card_link %}
+          <a href="{{ item.card_link }}" class="offers__btn">{% include "includes/icon_offers_turtle.html" %}<span>{{ item.btn_label }}</span></a>
+          {% elif item.booking_trigger == "morning" or item.booking_trigger == "sunset" %}
+          <button type="button" data-cruise-open="{{ item.booking_trigger }}" class="offers__btn">{% include "includes/icon_offers_turtle.html" %}<span>{{ item.btn_label }}</span></button>
           {% else %}
-          <a href="{{ item.card_link|default:'#' }}" class="offers__btn"><span>{{ item.btn_label }}</span></a>
+          <a href="{{ item.card_link|default:'#' }}" class="offers__btn">{% include "includes/icon_offers_turtle.html" %}<span>{{ item.btn_label }}</span></a>
           {% endif %}
         {% endif %}
       </div>

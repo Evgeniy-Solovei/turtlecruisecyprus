@@ -27,7 +27,7 @@
         {% endfor %}
       </div>
       {% endif %}
-      {% if d.button_text %}<a href="{{ d.button_url|default:'#' }}" class="food__btn" data-fancybox data-type="iframe">{{ d.button_text }}</a>{% endif %}
+      {% if d.button_text %}<a href="{{ d.button_url|default:'#'|youtube_embed }}" class="food__btn" data-fancybox data-type="iframe">{{ d.button_text }}</a>{% endif %}
     </div>
   </div>
 </section>

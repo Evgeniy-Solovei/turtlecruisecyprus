@@ -133,6 +133,9 @@ MIDDLEWARE = [
     "apps.audit.page_middleware.PageLoggingMiddleware",
 ]
 
+# Django defaults to same-origin, which breaks YouTube iframe embeds (error 153).
+SECURE_REFERRER_POLICY = "strict-origin-when-cross-origin"
+
 ROOT_URLCONF = "config.urls"
 
 TEMPLATES = [
@@ -229,6 +232,16 @@ CELERY_BEAT_SCHEDULE = {
 BOOKING_OVERBOOK_TOLERANCE = int(env("BOOKING_OVERBOOK_TOLERANCE", "1"))
 SITE_BASE_URL = env("SITE_BASE_URL", "http://localhost:8000")
 GTM_CONTAINER_ID = env("GTM_CONTAINER_ID", "GTM-K63GCMLB")
+
+# Hero rating — env fallback; optional live fetch via Google Places API.
+GOOGLE_RATING_SCORE = env("GOOGLE_RATING_SCORE", "4.9")
+GOOGLE_REVIEW_COUNT = env("GOOGLE_REVIEW_COUNT", "840")
+GOOGLE_MAPS_URL = env(
+    "GOOGLE_MAPS_URL",
+    "https://maps.app.goo.gl/DzYbLKWhnp6vwMGV9",
+)
+GOOGLE_PLACES_API_KEY = env("GOOGLE_PLACES_API_KEY", "")
+GOOGLE_PLACE_ID = env("GOOGLE_PLACE_ID", "ChIJ0fyYD0LF3xQREt9gKpNwvU4")
 SUPPORT_EMAIL = env("SUPPORT_EMAIL", "book@turtlecruisecyprus.com")
 SUPPORT_PHONE = env("SUPPORT_PHONE")
 MEETING_POINT = env("MEETING_POINT", "Ayia Napa Harbour (Limanaki)")

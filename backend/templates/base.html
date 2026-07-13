@@ -4,6 +4,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
   <title>{% block title %}{{ seo.title|default:"Turtle Cruise Cyprus" }}{% endblock %}</title>
   <meta name="description" content="{% block meta_description %}{{ seo.description }}{% endblock %}">
   <meta name="robots" content="{{ seo.robots|default:'index,follow' }}">
@@ -23,6 +24,7 @@
   {% if seo.published_at %}<meta property="article:published_time" content="{{ seo.published_at }}">{% endif %}
   <link rel="icon" href="{% static 'frontend/img/favicon.png' %}">
   <link rel="stylesheet" href="{% static 'frontend/css/main.min.css' %}">
+  <link rel="stylesheet" href="{% static 'frontend/css/theme-overrides.css' %}">
   <link rel="stylesheet" href="{% static 'frontend/css/fancybox.min.css' %}">
   <link rel="stylesheet" href="{% static 'frontend/css/popup.css' %}">
   <link rel="stylesheet" href="{% static 'frontend/css/mobile.css' %}">
@@ -65,15 +67,20 @@
 <script>window.tcBooking = {{ booking_config_json|safe }};</script>
 <script src="{% static 'frontend/js/cruise-booking.js' %}"></script>
 <script>
+  const tcYoutubeIframe = {
+    type: 'iframe',
+    iframe: {
+      attr: {
+        referrerpolicy: 'strict-origin-when-cross-origin',
+        allow: 'autoplay; fullscreen; picture-in-picture; encrypted-media',
+        allowfullscreen: '',
+      },
+      css: { width: '90vw', height: '80vh' },
+    },
+  };
   Fancybox.bind('[data-fancybox="gallery"]', {});
-  Fancybox.bind('[data-fancybox][data-type="iframe"]', {
-    type: 'iframe',
-    iframe: { css: { width: '90vw', height: '80vh' } },
-  });
-  Fancybox.bind('[data-fancybox]:not([data-fancybox="gallery"]):not([data-type="iframe"])', {
-    type: 'iframe',
-    iframe: { css: { width: '90vw', height: '80vh' } },
-  });
+  Fancybox.bind('[data-fancybox][data-type="iframe"]', tcYoutubeIframe);
+  Fancybox.bind('[data-fancybox]:not([data-fancybox="gallery"]):not([data-type="iframe"])', tcYoutubeIframe);
 </script>
 {% block extra_js %}{% endblock %}
 </body>

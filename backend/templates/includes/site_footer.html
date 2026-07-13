@@ -2,8 +2,16 @@
 <footer class="footer">
   <div class="bg-block">
     <picture>
+      {% if site.footer.bg_mobile %}
+      <source media="(max-width:767.98px)" srcset="{{ site.footer.bg_mobile }}">
+      {% else %}
       <source media="(max-width:767.98px)" srcset="{% static 'frontend/img/dist/footer-mob-bg.jpg' %}">
+      {% endif %}
+      {% if site.footer.bg_desktop %}
+      <img src="{{ site.footer.bg_desktop }}" alt="">
+      {% else %}
       <img src="{% static 'frontend/img/dist/footer-bg.jpg' %}" alt="">
+      {% endif %}
     </picture>
     <div class="footer__gradient"></div>
   </div>
