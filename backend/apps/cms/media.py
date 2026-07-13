@@ -4,6 +4,7 @@ import re
 from typing import Any
 
 from .asset_urls import STATIC_DIST_FILENAMES, STATIC_DIST_PREFIX, resolve_public_asset_url
+from .site_media import resolve_site_media_url, rewrite_html_media_urls
 
 _media_map: dict[int, str] = {}
 
@@ -40,7 +41,8 @@ def resolve_attachment(media_map: dict[int, str], attachment_id: Any) -> str:
     rel = normalize_wp_media_path(media_map.get(aid, ""))
     if not rel:
         return ""
-    return f"/media/wp/{rel.lstrip('/')}"
+    static_url = resolve_site_media_url(f"/media/wp/{rel.lstrip('/')}")
+    return static_url
 
 
 def fix_media_urls_in_html(html: str) -> str:
@@ -63,8 +65,8 @@ def fix_media_urls_in_html(html: str) -> str:
             f"{STATIC_DIST_PREFIX}{name}",
             html,
         )
-    return html
+    return rewrite_html_media_urls(html)
 
 
 def resolve_attachment_url(url: str) -> str:
-    return resolve_public_asset_url(url)
+    return resolve_site_media_url(resolve_public_asset_url(url))

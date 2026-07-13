@@ -6,6 +6,7 @@ from django.conf import settings
 
 from apps.cms.asset_urls import normalize_footer_config
 from apps.cms.models import SiteConfig
+from apps.cms.site_media import resolve_site_media_url
 from apps.cruises.selectors import get_active_cruises
 from apps.cruises.time_utils import default_times_for_cruise
 
@@ -90,8 +91,8 @@ def booking_config(request):
                 "made_by_url": footer.get("made_by_url", ""),
                 "made_by_logo": footer.get("made_by_logo", ""),
                 "footer_logo": footer.get("footer_logo", ""),
-                "bg_desktop": locale_footer.get("bg_desktop", ""),
-                "bg_mobile": locale_footer.get("bg_mobile", ""),
+                "bg_desktop": resolve_site_media_url(locale_footer.get("bg_desktop", "")),
+                "bg_mobile": resolve_site_media_url(locale_footer.get("bg_mobile", "")),
             },
             "socials": socials or {
                 "tiktok": "https://www.tiktok.com/",

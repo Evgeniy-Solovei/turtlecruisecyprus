@@ -40,6 +40,14 @@ class Command(BaseCommand):
                 from apps.cms.importers.live import import_live_site_config
 
                 import_live_site_config()
+
+            from apps.cms.site_media import vendor_site_media
+
+            vendored = vendor_site_media()
+            self.stdout.write(
+                f"Site media vendored: {vendored['referenced']} files "
+                f"({vendored['missing']} missing from media/wp)"
+            )
             if home_len < MIN_IMPORTED_BODY:
                 dump = Path(settings.WP_SQL_DUMP_PATH) if hasattr(settings, "WP_SQL_DUMP_PATH") else None
                 if not dump or not dump.is_file():

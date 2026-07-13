@@ -5,6 +5,8 @@ from pathlib import Path
 
 from django.conf import settings
 
+from apps.cms.site_media import site_media_public_url
+
 from .i18n import DEFAULT_LOCALE, public_page_url
 
 # Fallback copy when CMS import is missing (matches live WP where noted).
@@ -155,6 +157,9 @@ def _media_url(wp_rel: str, static_fallback: str) -> dict[str, str]:
     if rel.startswith("media/wp/"):
         rel = rel[len("media/wp/") :]
     disk = Path(settings.MEDIA_ROOT) / "wp" / rel
+    static_url = site_media_public_url(rel)
+    if static_url:
+        return {"url": static_url, "kind": "media"}
     if disk.is_file():
         return {"url": f"/media/wp/{rel}", "kind": "media"}
     return {"url": static_fallback, "kind": "static"}

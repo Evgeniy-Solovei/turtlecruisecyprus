@@ -37,7 +37,7 @@ backend/db.sqlite3
 backend/*.sqlite3
 backend/staticfiles/
 
-# WP media (in git — needed for /media/wp/ after import_wp_site)
+# WP media (legacy import source). Site photos live in static/frontend/img/site/ (git).
 
 # WordPress dump (large, contains customer data)
 turtlecruisebyscubacat/
