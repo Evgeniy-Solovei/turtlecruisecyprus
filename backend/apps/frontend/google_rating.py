@@ -61,7 +61,8 @@ def get_site_rating() -> dict[str, Any]:
     if cached:
         return cached
 
-    live = _fetch_places_api()
+    use_live_api = getattr(settings, "GOOGLE_RATING_USE_LIVE_API", False)
+    live = _fetch_places_api() if use_live_api else None
     if live:
         data = live
     else:

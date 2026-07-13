@@ -242,6 +242,7 @@ GOOGLE_MAPS_URL = env(
 )
 GOOGLE_PLACES_API_KEY = env("GOOGLE_PLACES_API_KEY", "")
 GOOGLE_PLACE_ID = env("GOOGLE_PLACE_ID", "ChIJ0fyYD0LF3xQREt9gKpNwvU4")
+GOOGLE_RATING_USE_LIVE_API = env("GOOGLE_RATING_USE_LIVE_API", "0") in ("1", "true", "True", "yes")
 SUPPORT_EMAIL = env("SUPPORT_EMAIL", "book@turtlecruisecyprus.com")
 SUPPORT_PHONE = env("SUPPORT_PHONE")
 MEETING_POINT = env("MEETING_POINT", "Ayia Napa Harbour (Limanaki)")

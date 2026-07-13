@@ -1,6 +1,6 @@
 from django.core.management.base import BaseCommand
 
-from apps.cms.site_media import vendor_site_media
+from apps.cms.site_media import bake_cms_media_urls, vendor_site_media
 
 
 class Command(BaseCommand):
@@ -26,4 +26,9 @@ class Command(BaseCommand):
             )
         else:
             self.stdout.write(self.style.SUCCESS(msg))
+            baked = bake_cms_media_urls()
+            if any(baked.values()):
+                self.stdout.write(
+                    f"Baked CMS media URLs: pages={baked['pages']} posts={baked['posts']} configs={baked['configs']}"
+                )
         self.stdout.write("URLs in HTML resolve to /static/frontend/img/site/ on deploy.")

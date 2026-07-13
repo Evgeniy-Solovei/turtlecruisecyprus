@@ -80,6 +80,16 @@ def _page_context(request, path: str) -> dict:
     elif slug == "fulfillment-policy":
         ctx["page_title"] = SITE_I18N.get(locale, SITE_I18N["en"])["footer_fulfillment"]
 
+    from django.conf import settings
+
+    if (
+        not ctx["page_html"]
+        and content_partial
+        and getattr(settings, "CMS_DISABLE_TEMPLATE_FALLBACK", False)
+        and slug != "blog"
+    ):
+        raise Http404(f"CMS snapshot missing content for /{slug or ''}")
+
     if slug == "blog" and not ctx["page_html"]:
         ctx["content_partial"] = "includes/blog_listing.html"
         ctx["page_title"] = ctx["page_title"] or "Blog"
