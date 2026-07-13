@@ -112,11 +112,12 @@ def create_or_get_payment_intent(booking: Booking) -> Payment:
         category="payment",
         action="checkout_session_created",
         entity_type="payment",
-        entity_id=session["id"],
+        entity_id=str(payment.id),
         booking_id=booking.id,
         details={
             "amount": str(booking.total_amount),
             "currency": booking.currency,
+            "checkout_session_id": _stripe_object_id(session.get("id")) or "",
             "stripe_expires_at": checkout_deadline_for_payment(payment).isoformat(),
         },
     )

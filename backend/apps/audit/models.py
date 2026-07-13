@@ -111,7 +111,7 @@ class OperationLog(models.Model):
     action = models.CharField("Действие", max_length=64, db_index=True)
     status = models.CharField("Статус", max_length=16, choices=Status.choices, default=Status.STARTED)
     entity_type = models.CharField("Тип сущности", max_length=32, blank=True)
-    entity_id = models.CharField("ID сущности", max_length=64, blank=True, db_index=True)
+    entity_id = models.CharField("ID сущности", max_length=128, blank=True, db_index=True)
     booking = models.ForeignKey(
         "bookings.Booking",
         verbose_name="Бронь",

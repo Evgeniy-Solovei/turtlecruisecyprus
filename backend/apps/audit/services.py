@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import logging
 import re
 import time
 import uuid
@@ -8,6 +9,8 @@ from typing import Any
 from django.utils import timezone
 
 from .models import ApiRequestLog, JourneyEvent, OperationLog, PageView, VisitorSession
+
+logger = logging.getLogger(__name__)
 
 SENSITIVE_KEYS = {
     "password",
@@ -226,18 +229,27 @@ def log_operation(
     session_id: str = "",
     details: dict | None = None,
     error: str = "",
-) -> OperationLog:
-    return OperationLog.objects.create(
-        category=category,
-        action=action,
-        status=status,
-        entity_type=entity_type,
-        entity_id=entity_id,
-        booking_id=booking_id,
-        session_id=session_id,
-        details=sanitize_payload(details),
-        error=error[:2000],
-    )
+) -> OperationLog | None:
+    try:
+        return OperationLog.objects.create(
+            category=category[:32],
+            action=action[:64],
+            status=status,
+            entity_type=entity_type[:32],
+            entity_id=str(entity_id)[:128],
+            booking_id=booking_id,
+            session_id=session_id[:64],
+            details=sanitize_payload(details),
+            error=error[:2000],
+        )
+    except Exception:
+        logger.exception(
+            "Failed to write operation log category=%s action=%s entity_id=%s",
+            category,
+            action,
+            entity_id,
+        )
+        return None
 
 
 def log_api_request(
