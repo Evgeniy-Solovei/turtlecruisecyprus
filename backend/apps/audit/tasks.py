@@ -6,17 +6,19 @@ from celery import shared_task
 from django.db.models import Avg, Count
 from django.utils import timezone
 
+from apps.bookings.models import Booking
+
 from .models import JourneyEvent, PageView, VisitorSession
 
+# Шаги совпадают с cruise-booking.js: 1 = дата/круиз, 2 = контакты, 3 = оплата
 BOOKING_FUNNEL_STEPS = [
-    ("popup_open", "", "Открыл форму бронирования"),
-    ("step_view", "1", "Шаг 1 — дата"),
-    ("step_view", "2", "Шаг 2 — пассажиры"),
-    ("step_view", "3", "Шаг 3 — контакты"),
-    ("step_view", "4", "Шаг 4 — оплата"),
-    ("booking_created", "", "Создал бронь (hold)"),
-    ("payment_started", "", "Начал оплату"),
-    ("payment_completed", "", "Оплатил"),
+    ("popup_open", "", "Открыл форму бронирования", "event"),
+    ("step_view", "1", "Шаг 1 — дата и круиз", "event"),
+    ("step_view", "2", "Шаг 2 — контакты", "event"),
+    ("step_view", "3", "Шаг 3 — оплата", "event"),
+    ("booking_created", "", "Создал бронь", "holds"),
+    ("payment_started", "", "Открыл форму Stripe", "event"),
+    ("payment_completed", "", "Оплатил", "paid"),
 ]
 
 
@@ -66,16 +68,26 @@ def _unique_sessions(events, event_type: str, step: str = "") -> int:
     return qs.values("session_id").distinct().count()
 
 
+def _funnel_count(
+    *,
+    events,
+    since,
+    event_type: str,
+    step: str,
+    source: str,
+    confirmed_bookings: int,
+    booking_holds: int,
+) -> int:
+    if source == "paid":
+        return confirmed_bookings
+    if source == "holds":
+        return booking_holds
+    return _unique_sessions(events, event_type, step)
+
+
 def build_funnel_summary(days: int = 7) -> dict:
     since = timezone.now() - timedelta(days=days)
     events = JourneyEvent.objects.filter(created_at__gte=since)
-
-    step_counts = (
-        events.exclude(step="")
-        .values("step", "event_type")
-        .annotate(count=Count("id"))
-        .order_by("step")
-    )
 
     page_stats = (
         PageView.objects.filter(entered_at__gte=since, is_active=False)
@@ -83,7 +95,6 @@ def build_funnel_summary(days: int = 7) -> dict:
         .annotate(
             views=Count("id"),
             avg_duration_ms=Avg("duration_ms"),
-            avg_scroll_pct=Avg("scroll_depth_pct"),
         )
         .order_by("-views")[:50]
     )
@@ -91,12 +102,28 @@ def build_funnel_summary(days: int = 7) -> dict:
     sessions = VisitorSession.objects.filter(first_seen_at__gte=since)
     sessions_total = sessions.count()
 
+    confirmed_bookings = Booking.objects.filter(
+        status=Booking.Status.CONFIRMED,
+        confirmed_at__gte=since,
+    ).count()
+    booking_holds = Booking.objects.filter(created_at__gte=since).count()
+    pending_payment = Booking.objects.filter(
+        created_at__gte=since,
+        status=Booking.Status.PENDING_PAYMENT,
+    ).count()
+
     funnel = []
-    prev_unique = None
-    for event_type, step, label in BOOKING_FUNNEL_STEPS:
-        unique = _unique_sessions(events, event_type, step)
+    for event_type, step, label, source in BOOKING_FUNNEL_STEPS:
+        unique = _funnel_count(
+            events=events,
+            since=since,
+            event_type=event_type,
+            step=step,
+            source=source,
+            confirmed_bookings=confirmed_bookings,
+            booking_holds=booking_holds,
+        )
         conversion_from_start = round((unique / sessions_total) * 100, 1) if sessions_total else 0
-        conversion_from_prev = round((unique / prev_unique) * 100, 1) if prev_unique else None
         funnel.append(
             {
                 "event_type": event_type,
@@ -104,30 +131,26 @@ def build_funnel_summary(days: int = 7) -> dict:
                 "label": label,
                 "unique_sessions": unique,
                 "conversion_from_start_pct": conversion_from_start,
-                "conversion_from_prev_pct": conversion_from_prev,
             }
         )
-        if unique:
-            prev_unique = unique
 
     popup_opens = _unique_sessions(events, "popup_open")
-    payments_done = _unique_sessions(events, "payment_completed")
-    booking_rate = round((payments_done / popup_opens) * 100, 1) if popup_opens else 0
+    booking_rate = round((confirmed_bookings / popup_opens) * 100, 1) if popup_opens else 0
 
     return {
         "period_days": days,
         "sessions_total": sessions_total,
-        "sessions_completed": sessions.filter(is_completed=True).count(),
-        "sessions_abandoned": sessions.filter(is_abandoned=True).count(),
+        "popup_opens": popup_opens,
+        "confirmed_bookings": confirmed_bookings,
+        "booking_holds": booking_holds,
+        "pending_payment": pending_payment,
         "booking_conversion_pct": booking_rate,
         "funnel": funnel,
-        "step_events": list(step_counts),
         "top_pages": [
             {
                 "path": row["path"],
                 "views": row["views"],
                 "avg_duration_sec": round((row["avg_duration_ms"] or 0) / 1000, 1),
-                "avg_scroll_pct": round(row["avg_scroll_pct"] or 0, 1),
             }
             for row in page_stats
         ],

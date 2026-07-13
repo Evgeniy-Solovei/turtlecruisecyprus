@@ -32,10 +32,8 @@
   </div>
 
   <div class="funnel-note">
-    <strong>Как читать эту страницу</strong><br>
-    Здесь видно, сколько людей заходило на сайт и до какого шага доходили в форме бронирования (кнопка BOOK NOW).<br><br>
-    Если в таблице везде нули — люди смотрели сайт (галерея, главная), но <strong>никто не нажимал BOOK NOW</strong>. Это нормально, если за период не было попыток брони.<br><br>
-    Реальные оплаченные брони смотрите в разделе <strong>Брони</strong> со статусом «Подтверждена».
+    Цифры «Оплатил» и «Подтверждённых броней» берутся из <strong>базы броней</strong> (как в разделе Брони).<br>
+    Остальные шаги — сколько раз открывали форму BOOK NOW в браузере (один человек с одной вкладки = одно число).
   </div>
 
   <div class="funnel-cards">
@@ -44,15 +42,23 @@
       <div class="funnel-card__value">{{ data.sessions_total }}</div>
     </div>
     <div class="funnel-card">
-      <div class="funnel-card__label">Оплатили до конца</div>
-      <div class="funnel-card__value">{{ data.sessions_completed }}</div>
+      <div class="funnel-card__label">Открыли форму бронирования</div>
+      <div class="funnel-card__value">{{ data.popup_opens }}</div>
     </div>
     <div class="funnel-card">
-      <div class="funnel-card__label">Бросили на полпути</div>
-      <div class="funnel-card__value">{{ data.sessions_abandoned }}</div>
+      <div class="funnel-card__label">Создали бронь</div>
+      <div class="funnel-card__value">{{ data.booking_holds }}</div>
     </div>
     <div class="funnel-card">
-      <div class="funnel-card__label">Дошли до оплаты / открыли форму</div>
+      <div class="funnel-card__label">Оплатили (подтверждено)</div>
+      <div class="funnel-card__value">{{ data.confirmed_bookings }}</div>
+    </div>
+    <div class="funnel-card">
+      <div class="funnel-card__label">Ждут оплаты</div>
+      <div class="funnel-card__value">{{ data.pending_payment }}</div>
+    </div>
+    <div class="funnel-card">
+      <div class="funnel-card__label">Конверсия: оплата / открыли форму</div>
       <div class="funnel-card__value">{{ data.booking_conversion_pct }}%</div>
     </div>
   </div>
@@ -63,9 +69,8 @@
       <thead>
         <tr>
           <th>Шаг</th>
-          <th>Человек</th>
-          <th>% от всех посетителей</th>
-          <th>% от прошлого шага</th>
+          <th>Кол-во</th>
+          <th>% от посетителей</th>
         </tr>
       </thead>
       <tbody>
@@ -74,7 +79,6 @@
           <td>{{ row.label }}</td>
           <td>{{ row.unique_sessions }}</td>
           <td>{{ row.conversion_from_start_pct }}%</td>
-          <td>{% if row.conversion_from_prev_pct != None %}{{ row.conversion_from_prev_pct }}%{% else %}—{% endif %}</td>
         </tr>
         {% endfor %}
       </tbody>
@@ -89,7 +93,6 @@
           <th>Страница</th>
           <th>Просмотров</th>
           <th>Среднее время, сек</th>
-          <th>Дочитали страницу, %</th>
         </tr>
       </thead>
       <tbody>
@@ -98,10 +101,9 @@
           <td>{{ row.path }}</td>
           <td>{{ row.views }}</td>
           <td>{{ row.avg_duration_sec }}</td>
-          <td>{{ row.avg_scroll_pct }}</td>
         </tr>
         {% empty %}
-        <tr><td colspan="4">Нет данных за выбранный период</td></tr>
+        <tr><td colspan="3">Нет данных за выбранный период</td></tr>
         {% endfor %}
       </tbody>
     </table>
