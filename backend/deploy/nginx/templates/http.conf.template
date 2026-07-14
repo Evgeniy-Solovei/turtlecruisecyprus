@@ -8,14 +8,27 @@ server {
         root /var/www/certbot;
     }
 
+    # Hashed assets (name.12hex.ext from ManifestStaticFilesStorage) — safe to cache forever.
+    location ~* ^/static/.+\.[0-9a-f]{12}\.[a-z0-9]+$ {
+        root /app/staticfiles;
+        rewrite ^/static/(.*)$ /$1 break;
+        expires 1y;
+        add_header Cache-Control "public, max-age=31536000, immutable";
+        access_log off;
+    }
+
+    # Unhashed paths (CMS body_html, rare fallbacks) — shorter cache so updates are visible.
     location /static/ {
         alias /app/staticfiles/;
-        expires 30d;
+        expires 7d;
+        add_header Cache-Control "public, max-age=604800";
+        access_log off;
     }
 
     location /media/ {
         alias /app/media/;
         expires 7d;
+        add_header Cache-Control "public, max-age=604800";
     }
 
     location / {
@@ -25,5 +38,7 @@ server {
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto $scheme;
         proxy_read_timeout 120s;
+        # HTML/API: don't cache at the edge — always fresh booking/CMS pages.
+        add_header Cache-Control "no-store" always;
     }
 }

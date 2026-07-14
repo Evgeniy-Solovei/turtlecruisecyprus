@@ -46,11 +46,13 @@ PY
     exit 1
   fi
 
-  echo "==> Collecting static files (whitenoise)..."
-  gosu appuser python manage.py collectstatic --noinput
-
   echo "==> Syncing site content from git (CMS snapshot + images)..."
   gosu appuser python manage.py ensure_site_assets
+
+  # After assets are in place: clear STATIC_ROOT and rebuild with content hashes.
+  # {% static %} then points to new hashed URLs → browsers fetch fresh JS/CSS without hard refresh.
+  echo "==> Rebuilding static files (hashed collectstatic)..."
+  gosu appuser python manage.py collectstatic --noinput --clear
 else
   echo "==> Skipping migrations/collectstatic (RUN_MIGRATIONS!=1)"
 fi
