@@ -100,6 +100,7 @@ def build_booking_config(locale: str = DEFAULT_LOCALE) -> dict:
             "paymentNotReady": "Payment not ready. Please wait.",
             "fullyBooked": "Sorry, this date is fully booked.",
             "fullyBookedPaymentMsg": t.get("fully_booked_msg", "All seats for this date have just been booked."),
+            "tooManySeats": t.get("too_many_seats", "You can only book up to {n} seats for this date."),
             "spotsLeft": "spots left!",
             "spotsAvailable": "spots available.",
             "dayOff": "This date is not available (day off).",

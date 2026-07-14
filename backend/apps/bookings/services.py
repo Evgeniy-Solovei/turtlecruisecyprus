@@ -15,7 +15,7 @@ from apps.audit.models import OperationLog
 from apps.audit.services import log_journey_event, log_operation
 
 from .models import Booking, Customer
-from .selectors import confirmed_seats_for_date, is_date_sold_out
+from .selectors import available_seats_for_date, confirmed_seats_for_date, is_date_sold_out
 
 
 class BookingError(ValueError):
@@ -53,7 +53,8 @@ def create_booking_hold(data: BookingHoldInput) -> Booking:
             raise BookingError("Children are not allowed for this cruise.")
 
         seats = data.adults_count + data.children_count
-        if is_date_sold_out(cruise, data.cruise_date):
+        remaining = available_seats_for_date(cruise, data.cruise_date)
+        if seats > remaining:
             raise BookingError("Not enough seats available.")
 
         adult_price, child_price = effective_prices(cruise, data.cruise_date)

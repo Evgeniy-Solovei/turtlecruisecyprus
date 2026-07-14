@@ -163,6 +163,15 @@
         </div>
       </div>
 
+      <div class="tc-step tc-step--blocked" id="tcStepBlocked" style="display:none">
+        <div class="tc-success">
+          <div class="tc-success__icon" id="tcBlockedIcon" aria-hidden="true">🚫</div>
+          <h2 class="tc-success__title" id="tcBlockedTitle"></h2>
+          <p class="tc-success__text" id="tcBlockedMsg"></p>
+          <button type="button" class="tc-btn tc-btn--primary" id="tcBlockedRestart">{{ t.start_new_booking }}</button>
+        </div>
+      </div>
+
       <div class="tc-step tc-step--success" id="tcStepSuccess" style="display:none">
         <div class="tc-success">
           <h2 class="tc-success__title">{{ t.payment_success_title }}</h2>

@@ -96,6 +96,7 @@
     adults:       1,
     children:     0,
     total:        0,
+    availableSpots: null, // from /availability/ API (confirmed-only)
     firstName:    '',
     lastName:     '',
     email:        '',
@@ -118,6 +119,7 @@
   var $step1        = $('#tcStep1');
   var $step2        = $('#tcStep2');
   var $step3        = $('#tcStep3');
+  var $stepBlocked  = $('#tcStepBlocked');
   var $stepSuccess  = $('#tcStepSuccess');
 
   // Step indicators
@@ -197,6 +199,11 @@
   // ─── Open / Close ───────────────────────────────────────────────────────────
 
   function openPopup(cruiseType) {
+    if (!$('#tcStep1').length) {
+      window.location.reload();
+      return;
+    }
+
     if (cruiseType) {
       // Конкретний круїз — вибираємо і ховаємо другий
       state.cruiseType = cruiseType;
@@ -245,11 +252,26 @@
     state.adults       = 1;
     state.children     = 0;
     state.total        = 0;
+    state.availableSpots = null;
     state.bookingId    = null;
+    state.firstName    = '';
+    state.lastName     = '';
+    state.email        = '';
+    state.phone        = '';
+    state.notes        = '';
+
+    destroyStripeCheckout();
+    localStorage.removeItem('tc_pending_booking_id');
+    $stepBlocked.hide();
 
     $adultVal.text(1);
     $childVal.text(0);
     $dateInput.val('');
+    $firstName.val('');
+    $lastName.val('');
+    $email.val('');
+    $phone.val('');
+    $notes.val('');
     $('input[name="cruise_type"]').prop('checked', false);
     $termsAgree.prop('checked', false);
     $termsBlock.removeClass('is-open');
@@ -278,8 +300,13 @@
         url:  tcBooking.apiBaseUrl.replace(/\/$/, '') + '/bookings/' + encodeURIComponent(state.bookingId) + '/status/',
         type: 'GET',
         success: function(data) {
-          if (data && data.cancel_reason === 'sold_out') {
+          if (!data) return;
+          if (data.cancel_reason === 'sold_out') {
             handleSoldOutClosed();
+            return;
+          }
+          if (data.status === 'expired' || data.cancel_reason === 'hold_expired') {
+            handleSessionClosed();
           }
         }
       });
@@ -289,27 +316,40 @@
     state.statusPollInterval = setInterval(checkBookingStatus, 5000);
   }
 
-  function handleSoldOutClosed() {
-    stopBookingStatusPoll();
-
+  function destroyStripeCheckout() {
     if (stripeCheckout) {
       try { stripeCheckout.destroy(); } catch (e) {}
+      stripeCheckout = null;
     }
+    $('#tc-payment-element').empty();
+    $('#tc-payment-errors').text('');
+    $('#tc-stripe-placeholder').show();
+  }
 
+  function showBlockedStep(icon, title, message) {
+    stopBookingStatusPoll();
+    destroyStripeCheckout();
+
+    $('#tcBlockedIcon').text(icon || '🚫');
+    $('#tcBlockedTitle').text(title || '');
+    $('#tcBlockedMsg').text(message || '');
+
+    $step1.hide();
+    $step2.hide();
+    $step3.hide();
+    $stepSuccess.hide();
+    $stepBlocked.show();
+    $stepDots.removeClass('active done');
+    state.currentStep = 0;
+  }
+
+  function handleSoldOutClosed() {
     var soldOutMsg = tcBooking.i18n.fullyBookedPaymentMsg || tcBooking.i18n.fullyBooked;
+    showBlockedStep('🚫', tcBooking.i18n.fullyBooked, soldOutMsg);
+  }
 
-    $popup.find('.tc-popup__body').html(
-      '<div class="tc-success" style="padding:3rem 2rem;text-align:center">' +
-        '<div style="font-size:3rem;margin-bottom:1rem">🚫</div>' +
-        '<h2 style="font-family:var(--tc-font-display,sans-serif);color:#17096f;margin:0 0 1rem">' + tcBooking.i18n.fullyBooked + '</h2>' +
-        '<p style="color:#7b7b9a;margin-bottom:2rem">' + soldOutMsg + '</p>' +
-        '<button type="button" class="tc-btn tc-btn--primary" id="tcSoldOutClose">' + tcBooking.i18n.startNewBooking + '</button>' +
-      '</div>'
-    );
-
-    $(document).on('click', '#tcSoldOutClose', function() {
-      closePopup();
-    });
+  function handleSessionClosed() {
+    showBlockedStep('⏱', tcBooking.i18n.sessionExpired, tcBooking.i18n.sessionExpiredMsg);
   }
 
   // ─── Steps Navigation ───────────────────────────────────────────────────────
@@ -321,6 +361,7 @@
     $step1.hide();
     $step2.hide();
     $step3.hide();
+    $stepBlocked.hide();
     $stepSuccess.hide();
 
     $stepDots.removeClass('active done');
@@ -528,6 +569,15 @@
       return false;
     }
 
+    var adults = readAdults();
+    var children = readChildren();
+    if (state.availableSpots !== null && adults + children > state.availableSpots) {
+      var msg = (tcBooking.i18n.tooManySeats || 'You can only book up to {n} seats for this date.')
+        .replace('{n}', String(state.availableSpots));
+      alert(msg);
+      return false;
+    }
+
     state.date       = date;
     state.cruiseType = type;
 
@@ -596,13 +646,56 @@
       .fail(function(xhr) { callback(apiErrorMessage(xhr)); });
   }
 
+  // ─── Passenger counters (adults + children share one availability pool) ─────
+
+  function readAdults() {
+    return parseInt($adultVal.text(), 10) || 1;
+  }
+
+  function readChildren() {
+    return parseInt($childVal.text(), 10) || 0;
+  }
+
+  function seatCap() {
+    if (state.availableSpots !== null && state.availableSpots >= 0) {
+      return state.availableSpots;
+    }
+    return 30;
+  }
+
+  function maxAdultsAllowed() {
+    return Math.max(seatCap() - readChildren(), 1);
+  }
+
+  function maxChildrenAllowed() {
+    return Math.max(seatCap() - readAdults(), 0);
+  }
+
+  function clampPassengerCounts() {
+    var adults = readAdults();
+    var children = readChildren();
+    var cap = seatCap();
+    if (adults + children <= cap) {
+      return;
+    }
+    if (adults > cap) {
+      adults = Math.max(cap, 1);
+      children = 0;
+    } else {
+      children = Math.max(cap - adults, 0);
+    }
+    $adultVal.text(adults);
+    $childVal.text(children);
+    updateTotal();
+  }
+
   // ─── Counter Buttons ────────────────────────────────────────────────────────
 
   $(document).on('click', '.tc-counter__btn--plus', function() {
     var targetId = $(this).data('target');
     var $val = $('#' + targetId);
     var current = parseInt($val.text(), 10) || 0;
-    var max = 30;
+    var max = (targetId === 'tcAdultsVal') ? maxAdultsAllowed() : maxChildrenAllowed();
     if (current < max) {
       $val.text(current + 1);
       updateTotal();
@@ -671,6 +764,7 @@
     apiGet('/cruises/' + encodeURIComponent(cruiseType) + '/availability/?date=' + encodeURIComponent(date))
       .done(function(data) {
         $dateWrap.find('.tc-date-message').remove();
+        state.availableSpots = data.available;
 
         if (!data.bookable || data.available <= 0) {
           showDateMessage($dateWrap, tcBooking.i18n.fullyBooked, 'error');
@@ -682,6 +776,8 @@
           showDateMessage($dateWrap, data.available + ' ' + tcBooking.i18n.spotsAvailable, 'success');
           $next.prop('disabled', false);
         }
+        clampPassengerCounts();
+        updateTotal();
       })
       .fail(function() {
         $next.prop('disabled', false);
@@ -783,6 +879,7 @@
   $closeBtn.on('click', closePopup);
   $overlay.on('click', closePopup);
   $('#tcSuccessClose').on('click', closePopup);
+  $('#tcBlockedRestart').on('click', closePopup);
 
   $(document).on('keydown', function(e) {
     if (e.key === 'Escape' && $popup.hasClass('is-open')) {

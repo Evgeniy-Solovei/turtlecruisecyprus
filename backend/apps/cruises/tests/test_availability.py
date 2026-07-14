@@ -94,6 +94,37 @@ class AvailabilityTests(TestCase):
                 )
             )
 
+    def test_rejects_hold_when_seats_exceed_remaining(self):
+        target = date.today() + timedelta(days=34)
+        for i in range(9):
+            booking = create_booking_hold(
+                BookingHoldInput(
+                    cruise_code="morning",
+                    cruise_date=target,
+                    adults_count=1,
+                    children_count=0,
+                    first_name="Test",
+                    last_name=str(i),
+                    email=f"remain{i}@example.com",
+                    phone=f"+357000001{i}",
+                )
+            )
+            booking.confirm()
+            booking.save(update_fields=["status", "confirmed_at", "updated_at"])
+        with self.assertRaises(BookingError):
+            create_booking_hold(
+                BookingHoldInput(
+                    cruise_code="morning",
+                    cruise_date=target,
+                    adults_count=2,
+                    children_count=0,
+                    first_name="Too",
+                    last_name="Many",
+                    email="toomany@example.com",
+                    phone="+35700000200",
+                )
+            )
+
     def test_wp_compat_availability(self):
         target = date.today() + timedelta(days=35)
         response = self.client.post(

@@ -6,7 +6,7 @@ from django.shortcuts import get_object_or_404
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
-from apps.bookings.selectors import confirmed_seats_for_date, pending_seats_for_date
+from apps.bookings.selectors import available_seats_for_date, confirmed_seats_for_date, pending_seats_for_date
 
 from apps.cruises.time_utils import format_time_range, times_for_cruise_date
 
@@ -41,7 +41,7 @@ def cruise_availability(request, code: str):
             "capacity": capacity,
             "booked": confirmed,
             "pending": pending_seats_for_date(cruise, cruise_date),
-            "available": max(capacity - confirmed, 0),
+            "available": available_seats_for_date(cruise, cruise_date),
             "adult_price": adult_price,
             "child_price": child_price,
             "start_time": schedule.start_time if schedule else None,

@@ -40,5 +40,9 @@ def booked_seats_for_date(cruise: Cruise, cruise_date: date) -> int:
 
 def is_date_sold_out(cruise: Cruise, cruise_date: date) -> bool:
     """Новые брони блокируем при confirmed >= capacity. Pending не считаем."""
+    return available_seats_for_date(cruise, cruise_date) <= 0
+
+
+def available_seats_for_date(cruise: Cruise, cruise_date: date) -> int:
     capacity = effective_capacity(cruise, cruise_date)
-    return confirmed_seats_for_date(cruise, cruise_date) >= capacity
+    return max(capacity - confirmed_seats_for_date(cruise, cruise_date), 0)
