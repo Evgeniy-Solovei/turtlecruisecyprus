@@ -32,7 +32,7 @@ def stripe_payment_intent(request):
     booking_id = request.data.get("booking_id")
     if not booking_id:
         return Response({"detail": "booking_id is required."}, status=status.HTTP_400_BAD_REQUEST)
-    booking = get_object_or_404(Booking.objects.select_related("cruise"), public_id=booking_id)
+    booking = get_object_or_404(Booking.objects.select_related("cruise", "customer"), public_id=booking_id)
     try:
         payment = create_or_get_payment_intent(booking)
     except StripeNotConfigured as exc:

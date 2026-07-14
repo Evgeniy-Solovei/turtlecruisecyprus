@@ -93,6 +93,7 @@ def create_or_get_payment_intent(booking: Booking) -> Payment:
         idempotency_key=idempotency_key,
         return_url=return_url,
         expires_at=expires_unix,
+        customer_email=booking.customer.email,
     )
     client_secret = session.get("client_secret")
     if not client_secret:

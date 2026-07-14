@@ -60,13 +60,14 @@ def create_checkout_session(
     idempotency_key: str,
     return_url: str,
     expires_at: int,
+    customer_email: str | None = None,
 ):
     stripe = _stripe()
-    return stripe.checkout.Session.create(
-        ui_mode="embedded",
-        mode="payment",
-        expires_at=expires_at,
-        line_items=[
+    params: dict = {
+        "ui_mode": "embedded",
+        "mode": "payment",
+        "expires_at": expires_at,
+        "line_items": [
             {
                 "price_data": {
                     "currency": currency.lower(),
@@ -76,10 +77,16 @@ def create_checkout_session(
                 "quantity": 1,
             }
         ],
-        metadata=metadata,
-        return_url=return_url,
-        idempotency_key=idempotency_key,
-    )
+        "metadata": metadata,
+        "return_url": return_url,
+        "idempotency_key": idempotency_key,
+    }
+    email = (customer_email or "").strip()
+    if email:
+        # Prefill email in Checkout + request Stripe payment receipt to this address.
+        params["customer_email"] = email
+        params["payment_intent_data"] = {"receipt_email": email}
+    return stripe.checkout.Session.create(**params)
 
 
 def expire_checkout_session(session_id: str):
