@@ -37,6 +37,7 @@ def booking_context(booking: Booking) -> dict:
         "currency": booking.currency,
         "payment_id": payment.stripe_payment_intent_id if payment else "",
         "meeting_point": settings.MEETING_POINT,
+        "meeting_point_maps_url": settings.MEETING_POINT_MAPS_URL,
         "support_email": settings.SUPPORT_EMAIL,
         "support_phone": settings.SUPPORT_PHONE,
         "booking_already_paid": True,

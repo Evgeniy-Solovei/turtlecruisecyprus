@@ -15,6 +15,22 @@
     sunset_adult:   (tcBooking.prices && tcBooking.prices.sunset_adult)  ? parseFloat(tcBooking.prices.sunset_adult)  : 35,
   };
 
+  /** Apply day-specific prices from /availability/ (same source as capacity). */
+  function applyAvailabilityPrices(cruiseType, data) {
+    if (!data || data.adult_price == null) return;
+    var adult = parseFloat(data.adult_price);
+    if (isNaN(adult)) return;
+    if (cruiseType === 'morning') {
+      PRICES.morning_adult = adult;
+      if (data.child_price != null) {
+        var child = parseFloat(data.child_price);
+        if (!isNaN(child)) PRICES.morning_child = child;
+      }
+    } else {
+      PRICES.sunset_adult = adult;
+    }
+  }
+
   var SERVICES = (tcBooking.services && tcBooking.services.morning) ? tcBooking.services : {
     morning: { title: 'Morning Chill Out Cruise with BBQ', duration_label: '4h 30m' },
     sunset:  { title: 'Sunset Cruise', duration_label: '4h' },
@@ -499,11 +515,13 @@
     $('#tcStep2SummaryTitle').text(title);
     $('#tcStep2SummaryMeta').text(formatDate(state.date) + ', ' + time);
     $('#tcStep2SummaryRoute').text(tcBooking.i18n.route + ' ' + ROUTES[state.cruiseType]);
-    $('#tcStep2Adults').text(tcBooking.i18n.adults + ' ' + state.adults + ' (€' + (isMorning ? 45 : 35) + ')');
+    $('#tcStep2Adults').text(
+      tcBooking.i18n.adults + ' ' + state.adults + ' (€' + (isMorning ? PRICES.morning_adult : PRICES.sunset_adult) + ')'
+    );
 
     if (isMorning && state.children > 0) {
       $('#tcStep2ChildrenLine').show();
-      $('#tcStep2Children').text(tcBooking.i18n.children + ' ' + state.children + ' (€25)');
+      $('#tcStep2Children').text(tcBooking.i18n.children + ' ' + state.children + ' (€' + PRICES.morning_child + ')');
     } else {
       $('#tcStep2ChildrenLine').hide();
     }
@@ -765,6 +783,7 @@
       .done(function(data) {
         $dateWrap.find('.tc-date-message').remove();
         state.availableSpots = data.available;
+        applyAvailabilityPrices(cruiseType, data);
 
         if (!data.bookable || data.available <= 0) {
           showDateMessage($dateWrap, tcBooking.i18n.fullyBooked, 'error');
@@ -777,7 +796,7 @@
           $next.prop('disabled', false);
         }
         clampPassengerCounts();
-        updateTotal();
+        updateCruiseUI();
       })
       .fail(function() {
         $next.prop('disabled', false);

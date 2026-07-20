@@ -236,9 +236,10 @@ GTM_CONTAINER_ID = env("GTM_CONTAINER_ID", "GTM-K63GCMLB")
 # Hero rating — env fallback; optional live fetch via Google Places API.
 GOOGLE_RATING_SCORE = env("GOOGLE_RATING_SCORE", "4.9")
 GOOGLE_REVIEW_COUNT = env("GOOGLE_REVIEW_COUNT", "840")
+# Prefer coordinate URLs over maps.app.goo.gl short links — Google can re-resolve those.
 GOOGLE_MAPS_URL = env(
     "GOOGLE_MAPS_URL",
-    "https://maps.app.goo.gl/DzYbLKWhnp6vwMGV9",
+    "https://www.google.com/maps?q=34.9811233,34.0032025",
 )
 GOOGLE_PLACES_API_KEY = env("GOOGLE_PLACES_API_KEY", "")
 GOOGLE_PLACE_ID = env("GOOGLE_PLACE_ID", "ChIJ0fyYD0LF3xQREt9gKpNwvU4")
@@ -246,6 +247,11 @@ GOOGLE_RATING_USE_LIVE_API = env("GOOGLE_RATING_USE_LIVE_API", "0") in ("1", "tr
 SUPPORT_EMAIL = env("SUPPORT_EMAIL", "book@turtlecruisecyprus.com")
 SUPPORT_PHONE = env("SUPPORT_PHONE")
 MEETING_POINT = env("MEETING_POINT", "Ayia Napa Harbour (Limanaki)")
+# Scubacat berth at Limanaki (same pin as WP email maps.app.goo.gl/QSLFqUoDX8rCtAsz7).
+MEETING_POINT_MAPS_URL = env(
+    "MEETING_POINT_MAPS_URL",
+    "https://www.google.com/maps?q=34.9811233,34.0032025",
+)
 
 STRIPE_MODE = env("STRIPE_MODE", "test")
 if STRIPE_MODE == "test":
