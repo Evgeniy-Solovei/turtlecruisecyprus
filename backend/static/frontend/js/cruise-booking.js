@@ -147,6 +147,7 @@
   var $childVal     = $('#tcChildrenVal');
   var $childrenField = $('#tcChildrenField');
   var $adultsPrice  = $('#tcAdultsPrice');
+  var $childrenPrice = $('#tcChildrenPrice');
   var $totalAmount  = $('#tcTotalAmount');
   var $termsToggle  = $('#tcTermsToggle');
   var $termsBody    = $('#tcTermsBody');
@@ -429,6 +430,7 @@
     if (type === 'morning') {
       $childrenField.removeClass('is-hidden');
       $adultsPrice.text('€' + PRICES.morning_adult + ' ' + tcBooking.i18n.perPerson);
+      $childrenPrice.text('€' + PRICES.morning_child + ' ' + tcBooking.i18n.perPerson);
     } else if (type === 'sunset') {
       $childrenField.addClass('is-hidden');
       $childVal.text(0);
