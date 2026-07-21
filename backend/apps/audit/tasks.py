@@ -22,6 +22,42 @@ BOOKING_FUNNEL_STEPS = [
 ]
 
 
+@shared_task(name="apps.audit.tasks.write_api_request_log")
+def write_api_request_log(
+    *,
+    method: str,
+    path: str,
+    action: str = "",
+    query_string: str = "",
+    status_code: int,
+    duration_ms: int,
+    session_id: str = "",
+    booking_public_id: str = "",
+    ip_address: str | None = None,
+    request_summary: dict | None = None,
+    response_summary: dict | None = None,
+    error: str = "",
+) -> int:
+    """Persist API audit row off the request thread (Celery / eager)."""
+    from .services import log_api_request
+
+    log = log_api_request(
+        method=method,
+        path=path,
+        action=action,
+        query_string=query_string,
+        status_code=status_code,
+        duration_ms=duration_ms,
+        session_id=session_id,
+        booking_public_id=booking_public_id,
+        ip_address=ip_address,
+        request_summary=request_summary,
+        response_summary=response_summary,
+        error=error,
+    )
+    return log.id
+
+
 @shared_task(name="apps.audit.tasks.mark_abandoned_sessions")
 def mark_abandoned_sessions() -> int:
     """Помечает сессии бронирования без активности как брошенные."""

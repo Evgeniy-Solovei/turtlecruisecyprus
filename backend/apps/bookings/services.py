@@ -9,7 +9,7 @@ from django.utils import timezone
 
 from apps.cruises.models import Cruise, CruiseDateOverride
 from apps.cruises.selectors import get_date_override, get_schedule_for_date
-from apps.cruises.services import effective_capacity, effective_prices
+from apps.cruises.services import effective_capacity
 
 from apps.audit.models import OperationLog
 from apps.audit.services import log_journey_event, log_operation
@@ -53,11 +53,25 @@ def create_booking_hold(data: BookingHoldInput) -> Booking:
             raise BookingError("Children are not allowed for this cruise.")
 
         seats = data.adults_count + data.children_count
-        remaining = available_seats_for_date(cruise, data.cruise_date)
+        capacity = (
+            override.capacity_override
+            if override and override.capacity_override is not None
+            else cruise.default_capacity
+        )
+        remaining = available_seats_for_date(cruise, data.cruise_date, capacity=capacity)
         if seats > remaining:
             raise BookingError("Not enough seats available.")
 
-        adult_price, child_price = effective_prices(cruise, data.cruise_date)
+        adult_price = (
+            override.adult_price_override
+            if override and override.adult_price_override is not None
+            else cruise.default_adult_price
+        )
+        child_price = (
+            override.child_price_override
+            if override and override.child_price_override is not None
+            else cruise.default_child_price
+        )
         total_amount = (Decimal(data.adults_count) * adult_price) + (Decimal(data.children_count) * child_price)
         customer, _ = Customer.objects.update_or_create(
             email=data.email.strip().lower(),
@@ -82,30 +96,41 @@ def create_booking_hold(data: BookingHoldInput) -> Booking:
             customer_notes=data.customer_notes,
             source=data.source,
         )
-        log_operation(
-            category="booking",
-            action="hold_created",
-            entity_type="booking",
-            entity_id=booking.public_id,
-            booking_id=booking.id,
-            session_id=data.session_id,
-            details={
-                "cruise": cruise.code,
-                "date": str(data.cruise_date),
-                "seats": seats,
-                "total": str(total_amount),
-                "cruise_time": f"{schedule.start_time}-{schedule.end_time}",
-            },
-        )
-        if data.session_id:
-            log_journey_event(
-                session_id=data.session_id,
-                event_type="booking_created",
-                step="3",
-                cruise_code=cruise.code,
-                booking_id=booking.id,
-                payload={"public_id": booking.public_id, "total": str(total_amount)},
+        booking_id = booking.id
+        public_id = booking.public_id
+        cruise_code = cruise.code
+        cruise_date_str = str(data.cruise_date)
+        session_id = data.session_id
+        cruise_time = f"{schedule.start_time}-{schedule.end_time}"
+        total_str = str(total_amount)
+
+        def _audit_after_commit():
+            log_operation(
+                category="booking",
+                action="hold_created",
+                entity_type="booking",
+                entity_id=public_id,
+                booking_id=booking_id,
+                session_id=session_id,
+                details={
+                    "cruise": cruise_code,
+                    "date": cruise_date_str,
+                    "seats": seats,
+                    "total": total_str,
+                    "cruise_time": cruise_time,
+                },
             )
+            if session_id:
+                log_journey_event(
+                    session_id=session_id,
+                    event_type="booking_created",
+                    step="3",
+                    cruise_code=cruise_code,
+                    booking_id=booking_id,
+                    payload={"public_id": public_id, "total": total_str},
+                )
+
+        transaction.on_commit(_audit_after_commit)
         return booking
 
 

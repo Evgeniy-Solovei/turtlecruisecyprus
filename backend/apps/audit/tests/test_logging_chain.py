@@ -29,19 +29,20 @@ class BookingChainLoggingTests(TestCase):
 
     def test_hold_creates_operation_log(self):
         target = date.today() + timedelta(days=20)
-        booking = create_booking_hold(
-            BookingHoldInput(
-                cruise_code="morning",
-                cruise_date=target,
-                adults_count=2,
-                children_count=0,
-                first_name="Log",
-                last_name="Test",
-                email="logtest@example.com",
-                phone="+35700000001",
-                session_id="sess-001",
+        with self.captureOnCommitCallbacks(execute=True):
+            booking = create_booking_hold(
+                BookingHoldInput(
+                    cruise_code="morning",
+                    cruise_date=target,
+                    adults_count=2,
+                    children_count=0,
+                    first_name="Log",
+                    last_name="Test",
+                    email="logtest@example.com",
+                    phone="+35700000001",
+                    session_id="sess-001",
+                )
             )
-        )
         self.assertTrue(OperationLog.objects.filter(booking=booking, action="hold_created").exists())
 
     def test_api_middleware_logs_request(self):
@@ -116,19 +117,20 @@ class BookingChainLoggingTests(TestCase):
 
     def test_booking_trace_endpoint(self):
         target = date.today() + timedelta(days=25)
-        booking = create_booking_hold(
-            BookingHoldInput(
-                cruise_code="morning",
-                cruise_date=target,
-                adults_count=1,
-                children_count=0,
-                first_name="Trace",
-                last_name="Test",
-                email="trace@example.com",
-                phone="+35700000005",
-                session_id="sess-trace",
+        with self.captureOnCommitCallbacks(execute=True):
+            booking = create_booking_hold(
+                BookingHoldInput(
+                    cruise_code="morning",
+                    cruise_date=target,
+                    adults_count=1,
+                    children_count=0,
+                    first_name="Trace",
+                    last_name="Test",
+                    email="trace@example.com",
+                    phone="+35700000005",
+                    session_id="sess-trace",
+                )
             )
-        )
         response = self.client.get(f"/api/v1/bookings/{booking.public_id}/trace/")
         self.assertEqual(response.status_code, 200)
         payload = response.json()

@@ -6,6 +6,7 @@ from django.http import HttpRequest, HttpResponse
 from django.utils.deprecation import MiddlewareMixin
 
 from .services import ApiTimer, extract_action_from_path, log_api_request, sanitize_payload
+from .tasks import write_api_request_log
 
 
 class ApiLoggingMiddleware(MiddlewareMixin):
@@ -24,7 +25,9 @@ class ApiLoggingMiddleware(MiddlewareMixin):
             return response
 
         timer = getattr(request, "_audit_timer", None)
-        duration_ms = timer.duration_ms if timer else 0
+        if not timer:
+            return response
+        duration_ms = timer.duration_ms
         request_summary = {}
         session_id = ""
         booking_public_id = ""
@@ -43,6 +46,8 @@ class ApiLoggingMiddleware(MiddlewareMixin):
                 request_summary = sanitize_payload(dict(request.POST))
                 session_id = str(request.POST.get("session_id") or request.POST.get("tc_session_id") or "")
                 booking_public_id = str(request.POST.get("booking_id") or "")
+        elif request.method == "GET" and request.META.get("QUERY_STRING"):
+            request_summary = sanitize_payload({k: v for k, v in request.GET.items()})
 
         response_summary = {}
         if response.get("Content-Type", "").startswith("application/json"):
@@ -55,18 +60,26 @@ class ApiLoggingMiddleware(MiddlewareMixin):
         if not action and request.method == "POST" and hasattr(request, "POST"):
             action = str(request.POST.get("action") or "")
 
-        log_api_request(
-            method=request.method,
-            path=request.path,
-            action=action,
-            query_string=request.META.get("QUERY_STRING", ""),
-            status_code=response.status_code,
-            duration_ms=duration_ms,
-            session_id=session_id,
-            booking_public_id=booking_public_id,
-            ip_address=request.META.get("REMOTE_ADDR"),
-            request_summary=request_summary,
-            response_summary=response_summary,
-            error="" if response.status_code < 400 else response_summary.get("detail", ""),
-        )
+        payload = {
+            "method": request.method,
+            "path": request.path,
+            "action": action,
+            "query_string": request.META.get("QUERY_STRING", ""),
+            "status_code": response.status_code,
+            "duration_ms": duration_ms,
+            "session_id": session_id,
+            "booking_public_id": booking_public_id,
+            "ip_address": request.META.get("REMOTE_ADDR"),
+            "request_summary": request_summary,
+            "response_summary": response_summary,
+            "error": "" if response.status_code < 400 else response_summary.get("detail", ""),
+        }
+        try:
+            write_api_request_log.delay(**payload)
+        except Exception:
+            # Broker down / misconfigured — still keep the log, sync fallback.
+            try:
+                log_api_request(**payload)
+            except Exception:
+                pass
         return response

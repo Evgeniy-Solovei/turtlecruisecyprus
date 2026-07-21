@@ -39,9 +39,13 @@ def _redact_value(key: str, value: Any) -> Any:
     return value
 
 
-def sanitize_payload(data: dict | None) -> dict:
+def sanitize_payload(data: dict | list | None) -> dict:
     if not data:
         return {}
+    if isinstance(data, list):
+        return {"items": [_redact_value("item", item) for item in data[:20]]}
+    if not isinstance(data, dict):
+        return {"value": _redact_value("value", data)}
     return {key: _redact_value(key, value) for key, value in data.items()}
 
 

@@ -76,6 +76,8 @@ class BookingSerializer(serializers.ModelSerializer):
         ]
 
     def get_checkout_expires_at(self, obj: Booking) -> str | None:
+        if obj.status != Booking.Status.PENDING_PAYMENT:
+            return None
         from apps.payments.models import Payment
         from apps.payments.services import checkout_deadline_for_payment
 

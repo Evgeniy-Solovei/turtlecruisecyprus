@@ -10,32 +10,39 @@ from apps.cruises.services import effective_capacity
 from .models import Booking
 
 
-def confirmed_seats_for_date(cruise: Cruise, cruise_date: date) -> int:
-    total = (
+def seats_breakdown_for_date(cruise: Cruise, cruise_date: date) -> tuple[int, int]:
+    """Return (confirmed_seats, pending_seats) in one aggregate query."""
+    rows = (
         Booking.objects.filter(
             cruise=cruise,
             cruise_date=cruise_date,
-            status=Booking.Status.CONFIRMED,
-        ).aggregate(total=Sum("total_seats"))["total"]
-        or 0
+            status__in=[Booking.Status.CONFIRMED, Booking.Status.PENDING_PAYMENT],
+        )
+        .values("status")
+        .annotate(total=Sum("total_seats"))
     )
-    return int(total)
+    confirmed = 0
+    pending = 0
+    for row in rows:
+        total = int(row["total"] or 0)
+        if row["status"] == Booking.Status.CONFIRMED:
+            confirmed = total
+        elif row["status"] == Booking.Status.PENDING_PAYMENT:
+            pending = total
+    return confirmed, pending
+
+
+def confirmed_seats_for_date(cruise: Cruise, cruise_date: date) -> int:
+    return seats_breakdown_for_date(cruise, cruise_date)[0]
 
 
 def pending_seats_for_date(cruise: Cruise, cruise_date: date) -> int:
-    total = (
-        Booking.objects.filter(
-            cruise=cruise,
-            cruise_date=cruise_date,
-            status=Booking.Status.PENDING_PAYMENT,
-        ).aggregate(total=Sum("total_seats"))["total"]
-        or 0
-    )
-    return int(total)
+    return seats_breakdown_for_date(cruise, cruise_date)[1]
 
 
 def booked_seats_for_date(cruise: Cruise, cruise_date: date) -> int:
-    return confirmed_seats_for_date(cruise, cruise_date) + pending_seats_for_date(cruise, cruise_date)
+    confirmed, pending = seats_breakdown_for_date(cruise, cruise_date)
+    return confirmed + pending
 
 
 def is_date_sold_out(cruise: Cruise, cruise_date: date) -> bool:
@@ -43,6 +50,8 @@ def is_date_sold_out(cruise: Cruise, cruise_date: date) -> bool:
     return available_seats_for_date(cruise, cruise_date) <= 0
 
 
-def available_seats_for_date(cruise: Cruise, cruise_date: date) -> int:
-    capacity = effective_capacity(cruise, cruise_date)
-    return max(capacity - confirmed_seats_for_date(cruise, cruise_date), 0)
+def available_seats_for_date(cruise: Cruise, cruise_date: date, *, capacity: int | None = None) -> int:
+    if capacity is None:
+        capacity = effective_capacity(cruise, cruise_date)
+    confirmed, _ = seats_breakdown_for_date(cruise, cruise_date)
+    return max(capacity - confirmed, 0)

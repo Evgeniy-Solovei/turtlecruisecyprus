@@ -237,14 +237,22 @@ def _finalize_successful_payment(payment: Payment, payment_intent_id: str, raw_s
 
 @transaction.atomic
 def confirm_booking_from_payment_intent(payment_intent_id: str, raw_status: str = "succeeded") -> Payment:
-    payment = Payment.objects.select_for_update().select_related("booking").get(stripe_payment_intent_id=payment_intent_id)
+    payment = (
+        Payment.objects.select_for_update()
+        .select_related("booking", "booking__cruise", "booking__customer")
+        .get(stripe_payment_intent_id=payment_intent_id)
+    )
     return _finalize_successful_payment(payment, payment_intent_id, raw_status)
 
 
 @transaction.atomic
 def confirm_booking_from_checkout_session(session: dict) -> Payment:
     session_id = _stripe_object_id(session.get("id")) or session["id"]
-    payment = Payment.objects.select_for_update().select_related("booking").get(stripe_checkout_session_id=session_id)
+    payment = (
+        Payment.objects.select_for_update()
+        .select_related("booking", "booking__cruise", "booking__customer")
+        .get(stripe_checkout_session_id=session_id)
+    )
     payment_intent_id = _stripe_object_id(session.get("payment_intent")) or payment.stripe_payment_intent_id or ""
     return _finalize_successful_payment(payment, payment_intent_id, session.get("status", "complete"))
 
@@ -254,7 +262,7 @@ def expire_booking_from_checkout_session(session_id: str, status: str = "expired
     """Stripe прислал checkout.session.expired — освобождаем места."""
     payment = (
         Payment.objects.select_for_update()
-        .select_related("booking")
+        .select_related("booking", "booking__cruise")
         .filter(stripe_checkout_session_id=session_id)
         .first()
     )

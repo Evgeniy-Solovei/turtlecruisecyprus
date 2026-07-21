@@ -6,14 +6,13 @@ from django.shortcuts import get_object_or_404
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
-from apps.bookings.selectors import available_seats_for_date, confirmed_seats_for_date, pending_seats_for_date
+from apps.bookings.selectors import seats_breakdown_for_date
 
-from apps.cruises.time_utils import format_time_range, times_for_cruise_date
+from apps.cruises.time_utils import format_time_range
 
 from .models import Cruise
 from .selectors import get_active_cruises, get_date_override, get_schedule_for_date
 from .serializers import CruiseSerializer
-from .services import effective_capacity, effective_prices
 
 
 @api_view(["GET"])
@@ -27,21 +26,37 @@ def cruise_availability(request, code: str):
     cruise_date = date.fromisoformat(request.query_params["date"])
     schedule = get_schedule_for_date(cruise, cruise_date)
     override = get_date_override(cruise, cruise_date)
-    capacity = effective_capacity(cruise, cruise_date)
-    confirmed = confirmed_seats_for_date(cruise, cruise_date)
-    adult_price, child_price = effective_prices(cruise, cruise_date)
-    _, _, time_label = times_for_cruise_date(cruise, cruise_date)
-    bookable = bool(schedule) and not (override and override.is_closed) and confirmed < capacity
+
+    capacity = (
+        override.capacity_override
+        if override and override.capacity_override is not None
+        else cruise.default_capacity
+    )
+    adult_price = (
+        override.adult_price_override
+        if override and override.adult_price_override is not None
+        else cruise.default_adult_price
+    )
+    child_price = (
+        override.child_price_override
+        if override and override.child_price_override is not None
+        else cruise.default_child_price
+    )
+    confirmed, pending = seats_breakdown_for_date(cruise, cruise_date)
+    available = max(capacity - confirmed, 0)
+    is_closed = bool(override and override.is_closed)
+    time_label = format_time_range(schedule.start_time, schedule.end_time) if schedule else ""
+
     return Response(
         {
             "cruise": cruise.code,
             "date": cruise_date,
-            "bookable": bookable,
-            "is_closed": bool(override and override.is_closed),
+            "bookable": bool(schedule) and not is_closed and available > 0,
+            "is_closed": is_closed,
             "capacity": capacity,
             "booked": confirmed,
-            "pending": pending_seats_for_date(cruise, cruise_date),
-            "available": available_seats_for_date(cruise, cruise_date),
+            "pending": pending,
+            "available": available,
             "adult_price": adult_price,
             "child_price": child_price,
             "start_time": schedule.start_time if schedule else None,

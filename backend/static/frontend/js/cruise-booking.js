@@ -74,6 +74,8 @@
     return $.ajax({ url: apiUrl(path), type: 'GET' });
   }
 
+  var availabilityXhr = null;
+
   function apiErrorMessage(xhr) {
     try {
       var data = JSON.parse(xhr.responseText);
@@ -751,11 +753,12 @@
   $dateInput.on('change', function() {
     var date = $(this).val();
     state.date = date;
-    tcTrack('date_selected', { step: '1', payload: { date: date } });
+    // Availability first — do not block UI behind audit/tracking.
     if ( state.cruiseType && date ) {
       checkDateAvailability( date, state.cruiseType );
     }
     updateSummary();
+    tcTrack('date_selected', { step: '1', payload: { date: date } });
   });
 
   // ─── Check Date Availability ─────────────────────────────────────────────────
@@ -781,7 +784,11 @@
       return;
     }
 
-    apiGet('/cruises/' + encodeURIComponent(cruiseType) + '/availability/?date=' + encodeURIComponent(date))
+    if (availabilityXhr && availabilityXhr.readyState !== 4) {
+      availabilityXhr.abort();
+    }
+
+    availabilityXhr = apiGet('/cruises/' + encodeURIComponent(cruiseType) + '/availability/?date=' + encodeURIComponent(date))
       .done(function(data) {
         $dateWrap.find('.tc-date-message').remove();
         state.availableSpots = data.available;
@@ -800,7 +807,8 @@
         clampPassengerCounts();
         updateCruiseUI();
       })
-      .fail(function() {
+      .fail(function(xhr, textStatus) {
+        if (textStatus === 'abort') return;
         $next.prop('disabled', false);
       });
   }
